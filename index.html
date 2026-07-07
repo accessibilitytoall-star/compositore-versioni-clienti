@@ -1,0 +1,1159 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Compositore Versioni Clienti — AccessibilityToAll</title>
+<meta name="description" content="Componi da solo la tua piattaforma: scegli funzioni, tema e prova gratuita. Prototipo accessibile di AccessibilityToAll.">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAyNTYgMjU2Jz48Y2lyY2xlIGN4PScxMjgnIGN5PScxMjgnIHI9JzEyMCcgZmlsbD0nIzBDNkNEMycgc3Ryb2tlPScjRUY4MjE2JyBzdHJva2Utd2lkdGg9JzEwJy8+PHRleHQgeD0nNTAlJyB5PSc1OCUnIGZvbnQtc2l6ZT0nMTQwJyB0ZXh0LWFuY2hvcj0nbWlkZGxlJyBmaWxsPScjZmZmJyBmb250LWZhbWlseT0nQXJpYWwnIGZvbnQtd2VpZ2h0PSdib2xkJz5BPC90ZXh0Pjwvc3ZnPg==">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    /* Tema applicato dall'utente (variabili live) */
+    --primary:#0C6CD3; --accent:#EF8216; --bg:#FBF7EF; --text:#211C18;
+    /* Costanti UI del compositore */
+    --ink:#211C18; --ink-soft:#5C564D; --line:#E4DCCC; --card:#FFFFFF;
+    --shell-1:#0A57AD; --shell-2:#06407E; --shell-3:#042447;
+    --on-shell:#EAF1FB; --on-shell-soft:#B8CBE6; --gold:#E6C45A;
+    --ok:#1F8A53; --warn:#C16A12; --err:#C62F2F;
+    --display:"Fraunces",Georgia,serif;
+    --body:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;
+    --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    --radius:16px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:var(--body);color:var(--ink);font-size:16px;line-height:1.55;
+    background:radial-gradient(130% 100% at 50% 0%, var(--shell-1) 0%, var(--shell-2) 46%, var(--shell-3) 100%) fixed;
+    -webkit-font-smoothing:antialiased;min-height:100vh}
+  .skip{position:absolute;left:-999px;top:0;background:var(--primary);color:#fff;padding:.6rem 1rem;z-index:200;border-radius:0 0 8px 0}
+  .skip:focus{left:0}
+  .app{max-width:940px;margin:0 auto;padding:20px 18px 70px}
+
+  /* Header + stepper */
+  header.bar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:14px}
+  .logo{display:inline-flex;align-items:center;gap:10px;color:var(--on-shell);text-decoration:none}
+  .logo .mark{width:40px;height:40px;border-radius:50%;background:var(--primary);border:3px solid var(--accent);
+    display:grid;place-content:center;font-family:var(--display);font-weight:700;color:#fff;font-size:20px}
+  .logo b{font-family:var(--display);font-weight:700;font-size:18px;line-height:1}
+  .logo span{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--on-shell-soft)}
+  .trialtag{margin-left:auto;font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;
+    color:#06407E;background:linear-gradient(135deg,#E0BE4E,#FFF6D6 60%,#EBCB6E);padding:7px 13px;border-radius:999px;font-weight:700}
+  .trialtag[hidden]{display:none}
+
+  nav.steps{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 18px;padding:0;list-style:none}
+  nav.steps li{flex:1 1 auto}
+  nav.steps .s{display:flex;align-items:center;gap:7px;width:100%;font-family:var(--mono);font-size:10.5px;letter-spacing:.03em;
+    text-transform:uppercase;color:var(--on-shell-soft);background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.18);
+    padding:8px 10px;border-radius:10px}
+  nav.steps .s .n{width:20px;height:20px;border-radius:50%;flex:0 0 auto;display:grid;place-content:center;font-size:11px;
+    background:rgba(255,255,255,.14);color:var(--on-shell)}
+  nav.steps .s.done{color:#CFE6D6;border-color:rgba(120,200,150,.4)}
+  nav.steps .s.done .n{background:var(--ok);color:#fff}
+  nav.steps .s.current{color:#fff;border-color:var(--accent);background:rgba(239,130,22,.16)}
+  nav.steps .s.current .n{background:var(--accent);color:#fff}
+
+  /* Screens */
+  .screen{display:none}
+  .screen.active{display:block;animation:fade .3s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  @media (prefers-reduced-motion:reduce){.screen.active{animation:none}}
+
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:26px 24px;
+    box-shadow:0 18px 40px -26px rgba(0,0,0,.7)}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--primary);margin:0 0 8px}
+  h1{font-family:var(--display);font-weight:700;font-size:clamp(26px,5vw,40px);line-height:1.05;margin:0 0 6px;color:var(--ink)}
+  h2.sc{font-family:var(--display);font-weight:700;font-size:clamp(22px,4vw,30px);margin:0 0 6px;color:var(--ink)}
+  .lead{color:var(--ink-soft);margin:0 0 20px;max-width:60ch}
+  h3{font-family:var(--display);font-weight:600;font-size:18px;margin:22px 0 10px}
+
+  label.f{display:block;font-weight:600;margin:14px 0 6px}
+  .req{color:var(--err)}
+  input[type=text],input[type=email],input[type=password]{width:100%;border:1.5px solid var(--line);border-radius:10px;
+    padding:12px 13px;font-family:inherit;font-size:15px;background:#fff;color:var(--ink)}
+  input:focus-visible,button:focus-visible,select:focus-visible,a:focus-visible,[tabindex]:focus-visible,.card-check:focus-within{outline:3px solid var(--primary);outline-offset:2px}
+  .hint{font-size:13px;color:var(--ink-soft);margin-top:5px}
+  .err-msg{color:#9A1F1B;font-size:13.5px;font-weight:600;margin-top:6px;display:flex;align-items:center;gap:6px}
+  .err-msg[hidden]{display:none}
+
+  .consent{display:flex;gap:11px;align-items:flex-start;margin:18px 0 4px;padding:13px 14px;border:1.5px solid var(--line);border-radius:12px;background:#FBF8F1}
+  .consent input{width:22px;height:22px;margin-top:1px;flex:0 0 auto;accent-color:var(--primary)}
+  .consent label{font-size:14.5px}
+
+  /* Choice cards */
+  .cards{display:grid;grid-template-columns:1fr;gap:12px;margin:6px 0}
+  @media(min-width:620px){.cards.two{grid-template-columns:1fr 1fr}.cards.three{grid-template-columns:1fr 1fr 1fr}}
+  .card-check{position:relative;display:block;border:2px solid var(--line);border-radius:14px;padding:16px 16px 16px 50px;cursor:pointer;background:#fff}
+  .card-check:hover{border-color:var(--primary)}
+  .card-check input{position:absolute;left:15px;top:16px;width:22px;height:22px;accent-color:var(--primary)}
+  .card-check.sel{border-color:var(--primary);background:#F1F7FE;box-shadow:inset 0 0 0 1px var(--primary)}
+  .card-check .t{font-weight:700;font-family:var(--display);font-size:17px}
+  .card-check .d{font-size:13.5px;color:var(--ink-soft);margin-top:3px}
+  .card-check .tag{display:inline-block;margin-top:8px;font-family:var(--mono);font-size:10.5px;letter-spacing:.04em;text-transform:uppercase;
+    background:#EAF1FB;color:#1E3F73;padding:3px 8px;border-radius:999px;font-weight:700}
+
+  /* Trial cards */
+  .trials{display:grid;grid-template-columns:1fr;gap:14px}
+  @media(min-width:680px){.trials{grid-template-columns:1fr 1fr 1fr}}
+  .trial{border:2px solid var(--line);border-radius:16px;padding:18px;background:#fff;text-align:center;cursor:pointer;position:relative}
+  .trial:hover{border-color:var(--primary)}
+  .trial.sel{border-color:var(--accent);box-shadow:inset 0 0 0 2px var(--accent);background:#FFF7EF}
+  .trial .days{font-family:var(--display);font-weight:700;font-size:40px;color:var(--primary);line-height:1}
+  .trial .u{font-family:var(--mono);font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-soft);margin-top:6px}
+  .trial .cap{margin-top:12px;font-weight:700}
+  .trial .cap b{color:var(--accent);font-family:var(--display);font-size:22px}
+  .trial .note{font-size:12.5px;color:var(--ink-soft);margin-top:8px}
+  .trial .noext{font-family:var(--mono);font-size:10px;letter-spacing:.04em;text-transform:uppercase;color:var(--warn);font-weight:700;margin-top:8px}
+  .balance{margin:12px 0 0;font-size:13.5px;color:var(--ink-soft);text-align:center}
+  .balance b{color:var(--ink)}
+
+  /* Catalog */
+  .toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:6px 0 16px}
+  .search{flex:1;min-width:220px;position:relative}
+  .search input{padding-left:38px}
+  .search svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:17px;height:17px;color:var(--ink-soft)}
+  .grp{border:1.5px solid var(--line);border-radius:14px;margin:0 0 12px;overflow:hidden;background:#fff}
+  .grp-head{display:flex;align-items:center;gap:12px;padding:14px 16px;background:#F7F3EB}
+  .grp-head .sw{width:26px;height:26px;border-radius:8px;flex:0 0 auto;accent-color:var(--primary)}
+  .grp-head .gt{font-family:var(--display);font-weight:600;font-size:18px}
+  .grp-head .gc{margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--ink-soft)}
+  .grp-head .suggested{font-family:var(--mono);font-size:10px;letter-spacing:.04em;text-transform:uppercase;
+    background:var(--accent);color:#fff;padding:3px 8px;border-radius:999px;font-weight:700}
+  .grp-body{padding:6px 16px 14px;display:none}
+  .grp.open .grp-body{display:block}
+  .fn{display:flex;gap:10px;align-items:flex-start;padding:9px 0;border-top:1px solid var(--line)}
+  .fn:first-child{border-top:none}
+  .fn input{width:20px;height:20px;margin-top:2px;flex:0 0 auto;accent-color:var(--primary)}
+  .fn .fx{font-weight:600;font-size:14.5px}
+  .fn .fd{font-size:13px;color:var(--ink-soft)}
+  .dep{font-family:var(--mono);font-size:10.5px;color:var(--warn);margin-top:2px}
+  .toggle-body{margin-left:auto;background:none;border:1px solid var(--line);border-radius:8px;padding:5px 10px;cursor:pointer;font-size:12px;color:var(--primary)}
+
+  /* Summary */
+  .sumlist{list-style:none;margin:0;padding:0}
+  .sumlist li{display:flex;gap:10px;align-items:baseline;padding:10px 0;border-top:1px solid var(--line)}
+  .sumlist li:first-child{border-top:none}
+  .sumlist .k{font-family:var(--mono);font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-soft);min-width:130px}
+  .sumlist .v{font-weight:600}
+  .chips{display:flex;flex-wrap:wrap;gap:6px}
+  .chip{font-size:12.5px;background:#EAF1FB;color:#1E3F73;padding:4px 10px;border-radius:999px;font-weight:600}
+
+  /* Composer / progress */
+  .compose{text-align:center;padding:30px 10px}
+  .ringbig{width:150px;height:150px;margin:6px auto 14px;position:relative}
+  .ringbig svg{width:100%;height:100%;transform:rotate(-90deg)}
+  .ringbig .tk{fill:none;stroke:#E7EDF3;stroke-width:12}
+  .ringbig .fl{fill:none;stroke:var(--primary);stroke-width:12;stroke-linecap:round;transition:stroke-dashoffset .3s ease}
+  .ringbig .c{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+  .ringbig .pc{font-family:var(--display);font-weight:700;font-size:36px;color:var(--primary);line-height:1}
+  .barwrap{max-width:460px;margin:0 auto}
+  .bar{height:16px;border-radius:999px;background:#E7EDF3;overflow:hidden;border:1px solid var(--line)}
+  .bar>i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--primary),#3B8BE0);transition:width .3s ease}
+  .cstatus{font-family:var(--mono);font-size:13px;color:var(--ink-soft);margin-top:12px;min-height:20px}
+  .ceta{font-size:12.5px;color:var(--ink-soft);margin-top:4px}
+
+  /* Theme chooser */
+  .themegrid{display:grid;grid-template-columns:1fr;gap:20px}
+  @media(min-width:760px){.themegrid{grid-template-columns:1.1fr .9fr}}
+  .palettes{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .pal{border:2px solid var(--line);border-radius:12px;padding:10px;cursor:pointer;background:#fff}
+  .pal.sel{border-color:var(--primary);box-shadow:inset 0 0 0 1px var(--primary)}
+  .pal .sws{display:flex;gap:5px;margin-bottom:8px}
+  .pal .sws span{width:24px;height:24px;border-radius:6px;border:1px solid rgba(0,0,0,.1)}
+  .pal .pn{font-weight:600;font-size:13.5px}
+  .custom{margin-top:14px;border-top:1px solid var(--line);padding-top:12px}
+  .colrow{display:flex;gap:10px;flex-wrap:wrap;margin:8px 0}
+  .colrow .cc{flex:1;min-width:130px}
+  .colrow label{font-size:12.5px;font-weight:600;display:block;margin-bottom:4px}
+  .colrow .ci{display:flex;gap:6px;align-items:center}
+  .colrow input[type=color]{width:40px;height:38px;border:1px solid var(--line);border-radius:8px;background:#fff;padding:2px;cursor:pointer}
+  .colrow input[type=text]{flex:1;font-family:var(--mono);font-size:13px}
+  .fontrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+  .fontchip{border:2px solid var(--line);border-radius:10px;padding:8px 12px;cursor:pointer;background:#fff;font-size:14px}
+  .fontchip.sel{border-color:var(--primary);background:#F1F7FE}
+  .uploadrow{margin-top:10px}
+  .preview{border:1.5px solid var(--line);border-radius:14px;overflow:hidden;position:sticky;top:10px}
+  .pv-top{padding:14px 16px;color:#fff;background:var(--pv-primary,#0C6CD3)}
+  .pv-top b{font-family:var(--pv-font,var(--display));font-size:18px}
+  .pv-body{padding:16px;background:var(--pv-bg,#FBF7EF);color:var(--pv-text,#211C18);font-family:var(--pv-font,var(--body))}
+  .pv-body h4{margin:0 0 6px;font-size:16px}
+  .pv-btn{display:inline-block;margin-top:10px;background:var(--pv-accent,#EF8216);color:var(--pv-btn-text,#fff);padding:9px 15px;border-radius:9px;font-weight:700;font-size:14px}
+  .pv-link{color:var(--pv-primary,#0C6CD3);font-weight:600}
+  .contrast{margin-top:12px;border-radius:12px;padding:12px 14px;font-size:13.5px;font-weight:600;display:flex;gap:9px;align-items:flex-start}
+  .contrast.ok{background:#E7F4EC;color:#155F38;border:1.5px solid #A7D6BB}
+  .contrast.bad{background:#FBEAE6;color:#8A1F16;border:1.5px solid #E7B3A9}
+  .contrast .val{font-family:var(--mono);font-weight:700}
+
+  /* Ready / dashboard */
+  .toast{display:flex;gap:12px;align-items:flex-start;background:#E7F4EC;border:1.5px solid #A7D6BB;border-radius:14px;padding:14px 16px;margin-bottom:16px}
+  .toast .i{font-size:22px;line-height:1}
+  .modgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+  @media(min-width:620px){.modgrid{grid-template-columns:1fr 1fr 1fr}}
+  .mod{border:1.5px solid var(--line);border-radius:12px;padding:12px;background:#fff}
+  .mod .mt{font-weight:700;font-family:var(--display);font-size:15px}
+  .mod .mf{font-size:12.5px;color:var(--ink-soft);margin-top:3px}
+  .mod.usable{cursor:pointer;text-align:left;width:100%;font:inherit;display:block;transition:.15s}
+  .mod.usable:hover{border-color:var(--primary);box-shadow:0 8px 18px -12px rgba(12,108,211,.7);transform:translateY(-1px)}
+  .mod.usable:active{transform:translateY(0)}
+  .mod .usehint2{display:block;margin-top:7px;font-family:var(--mono);font-size:10.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--primary)}
+  .mod.spent{animation:pulse .5s ease}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(31,138,83,.5)}100%{box-shadow:0 0 0 12px rgba(31,138,83,0)}}
+  @media (prefers-reduced-motion:reduce){.mod.usable:hover{transform:none}.mod.spent{animation:none}}
+
+  .usebox{border:1.5px solid var(--line);border-radius:14px;padding:16px;background:#fff;margin-top:16px}
+  .usemeter{height:14px;border-radius:999px;background:#E7EDF3;overflow:hidden;border:1px solid var(--line);margin:8px 0}
+  .usemeter>i{display:block;height:100%;width:0;background:var(--primary);transition:width .3s ease,background .3s ease}
+  .usemeter.warn>i{background:var(--warn)}
+  .usemeter.full>i{background:var(--err)}
+  .usewrap{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between}
+  .daychip{font-family:var(--mono);font-size:12px;background:#EAF1FB;color:#1E3F73;padding:6px 11px;border-radius:999px;font-weight:700}
+
+  /* Buttons */
+  .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}
+  .btn{font-family:var(--body);font-weight:700;font-size:15px;border:none;border-radius:11px;padding:12px 20px;cursor:pointer;
+    display:inline-flex;align-items:center;gap:8px;text-decoration:none}
+  .btn.primary{background:var(--accent);color:#fff;box-shadow:0 10px 22px -10px rgba(239,130,22,.7)}
+  .btn.primary:hover{filter:brightness(1.05)}
+  .btn.primary:disabled{background:#D8CBBB;color:#fff;cursor:not-allowed;box-shadow:none}
+  .btn.blue{background:var(--primary);color:#fff}
+  .btn.ghost{background:#fff;color:var(--primary);border:1.5px solid var(--line)}
+  .btn.ghost:hover{border-color:var(--primary)}
+  .btn.link{background:none;color:var(--ink-soft);padding:12px 8px;font-weight:600}
+  .spacer{flex:1}
+
+  /* Modal (popup upgrade / feedback) */
+  .overlay{position:fixed;inset:0;background:rgba(6,26,52,.6);display:none;align-items:center;justify-content:center;z-index:150;padding:18px}
+  .overlay.on{display:flex}
+  .modal{background:#fff;border-radius:18px;max-width:460px;width:100%;padding:24px;box-shadow:0 30px 60px -20px rgba(0,0,0,.6)}
+  .modal h2{font-family:var(--display);font-size:22px;margin:0 0 8px}
+  .modal p{color:var(--ink-soft);margin:0 0 14px}
+  .modal .actions{margin-top:8px}
+
+  /* Win-back */
+  .winback{text-align:center}
+  .winback .heart{font-size:40px}
+  .offer{background:#FFF7EF;border:1.5px solid #F3D9BB;border-radius:14px;padding:16px;margin:18px 0}
+  .fbk{text-align:left;margin:14px 0}
+  .fbk .opt{display:flex;gap:10px;align-items:center;padding:8px 0}
+  .fbk .opt input{width:20px;height:20px;accent-color:var(--primary)}
+  footer.foot{margin-top:26px;text-align:center;color:var(--on-shell-soft);font-size:12.5px;font-family:var(--mono);letter-spacing:.03em}
+  .sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}
+  .devnote{margin-top:10px;font-size:12px;color:var(--on-shell-soft);text-align:center}
+  .devnote button{background:none;border:1px dashed rgba(255,255,255,.4);color:var(--on-shell-soft);border-radius:8px;padding:5px 10px;cursor:pointer;font-size:12px}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Salta al contenuto</a>
+<div class="app">
+  <header class="bar">
+    <a class="logo" href="#" onclick="return false" aria-label="AccessibilityToAll — Compositore Versioni Clienti">
+      <span class="mark" aria-hidden="true">A</span>
+      <span><b>AccessibilityToAll</b><span>Compositore piattaforma</span></span>
+    </a>
+    <span class="trialtag" id="trialtag" hidden></span>
+  </header>
+
+  <nav aria-label="Fasi della composizione">
+    <ol class="steps" id="stepper"></ol>
+  </nav>
+
+  <main id="main" tabindex="-1">
+
+    <!-- 0. INTRO -->
+    <section class="screen active" id="sc-intro" aria-labelledby="h-intro">
+      <div class="panel">
+        <p class="eyebrow">Benvenuta / Benvenuto</p>
+        <h1 id="h-intro" tabindex="-1">Componi la tua piattaforma, a modo tuo.</h1>
+        <p class="lead">In pochi passi crei l'account, ci dici di cosa ti occupi, scegli le funzioni che ti servono e l'aspetto (colori e font). In meno di cinque minuti la tua piattaforma è pronta — e la provi gratis prima di decidere. Ogni versione nasce già accessibile: è il nostro punto di partenza, non un optional.</p>
+        <div class="actions">
+          <button class="btn primary" onclick="go('account')">Inizia ora <span aria-hidden="true">→</span></button>
+          <button class="btn link" onclick="go('trial')">Ho fretta: salta alla prova</button>
+        </div>
+      </div>
+      <p class="devnote">Prototipo dimostrativo · i dati restano nel browser e non vengono inviati da nessuna parte.
+        <button type="button" onclick="resetAll()">Ricomincia da capo</button></p>
+    </section>
+
+    <!-- 1. ACCOUNT -->
+    <section class="screen" id="sc-account" aria-labelledby="h-account">
+      <div class="panel">
+        <p class="eyebrow">Passo 1 · Account</p>
+        <h2 class="sc" id="h-account" tabindex="-1">Crea il tuo account</h2>
+        <p class="lead">Bastano pochi dati. La password serve solo in questa demo per simulare l'accesso.</p>
+
+        <label class="f" for="acc-name">Nome e cognome <span class="req" aria-hidden="true">*</span></label>
+        <input type="text" id="acc-name" autocomplete="name" aria-required="true">
+        <p class="err-msg" id="err-name" hidden><span aria-hidden="true">⚠</span> Inserisci il tuo nome.</p>
+
+        <label class="f" for="acc-email">Email <span class="req" aria-hidden="true">*</span></label>
+        <input type="email" id="acc-email" autocomplete="email" aria-required="true">
+        <p class="err-msg" id="err-email" hidden><span aria-hidden="true">⚠</span> Inserisci un'email valida.</p>
+
+        <label class="f" for="acc-pass">Password <span class="req" aria-hidden="true">*</span></label>
+        <input type="password" id="acc-pass" autocomplete="new-password" aria-required="true" aria-describedby="pass-hint">
+        <p class="hint" id="pass-hint">Almeno 6 caratteri.</p>
+        <p class="err-msg" id="err-pass" hidden><span aria-hidden="true">⚠</span> La password deve avere almeno 6 caratteri.</p>
+
+        <div class="consent">
+          <input type="checkbox" id="acc-consent" aria-describedby="consent-txt">
+          <label for="acc-consent" id="consent-txt">Ho letto e accetto il <a href="#" onclick="return false" class="pv-link">Regolamento</a> e l'<a href="#" onclick="return false" class="pv-link">Informativa privacy</a>. <span class="req" aria-hidden="true">*</span></label>
+        </div>
+        <p class="err-msg" id="err-consent" hidden><span aria-hidden="true">⚠</span> Per proseguire devi accettare regolamento e privacy.</p>
+
+        <div class="actions">
+          <button class="btn ghost" onclick="go('intro')">Indietro</button>
+          <div class="spacer"></div>
+          <button class="btn primary" onclick="submitAccount()">Continua <span aria-hidden="true">→</span></button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. PROFILAZIONE -->
+    <section class="screen" id="sc-profile" aria-labelledby="h-profile">
+      <div class="panel">
+        <p class="eyebrow">Passo 2 · Profilazione</p>
+        <h2 class="sc" id="h-profile" tabindex="-1">Di cosa ti occupi?</h2>
+        <p class="lead">Scegli il profilo più vicino a te: ci serve per suggerirti subito le funzioni giuste. Potrai comunque cambiare tutto.</p>
+        <div class="cards two" id="profileCards" role="radiogroup" aria-label="Di cosa ti occupi"></div>
+
+        <h3 id="use-h">Come vuoi usare la piattaforma?</h3>
+        <div class="cards two" id="useCards" role="group" aria-labelledby="use-h"></div>
+
+        <div class="actions">
+          <button class="btn ghost" onclick="go('account')">Indietro</button>
+          <div class="spacer"></div>
+          <button class="btn primary" id="profileNext" onclick="submitProfile()" disabled>Continua <span aria-hidden="true">→</span></button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. PROVA -->
+    <section class="screen" id="sc-trial" aria-labelledby="h-trial">
+      <div class="panel">
+        <p class="eyebrow">Passo 3 · Prova gratuita</p>
+        <h2 class="sc" id="h-trial" tabindex="-1">Scegli quanto vuoi provarla</h2>
+        <p class="lead">Più giorni scegli, meno azioni al giorno hai a disposizione: la prova lunga è pensata per assaggiare con calma, quella corta per spremere tanto in poco tempo. Quando ti avvicini al tetto del giorno ti proponiamo l'upgrade.</p>
+        <div class="trials" id="trialCards" role="radiogroup" aria-label="Durata della prova"></div>
+        <p class="balance" id="trialBalance" role="status"></p>
+
+        <div class="actions">
+          <button class="btn ghost" onclick="go('profile')">Indietro</button>
+          <div class="spacer"></div>
+          <button class="btn primary" id="trialNext" onclick="submitTrial()" disabled>Continua <span aria-hidden="true">→</span></button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. FUNZIONI -->
+    <section class="screen" id="sc-features" aria-labelledby="h-features">
+      <div class="panel">
+        <p class="eyebrow">Passo 4 · Funzioni</p>
+        <h2 class="sc" id="h-features" tabindex="-1">Componi le tue funzioni</h2>
+        <p class="lead">Abbiamo già attivato i gruppi consigliati per te (contrassegnati con <span class="suggested">Consigliato</span>). Aggiungi o togli quello che vuoi. Alcune funzioni ne richiedono altre: le attiviamo per te e te lo diciamo.</p>
+        <div class="toolbar">
+          <div class="search">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+            <label class="sr" for="fsearch">Cerca una funzione</label>
+            <input type="text" id="fsearch" placeholder="Cerca una funzione…" oninput="renderCatalog()">
+          </div>
+          <span class="daychip" id="featCount" role="status">0 funzioni attive</span>
+        </div>
+        <div id="catalog"></div>
+        <div class="actions">
+          <button class="btn ghost" onclick="go('trial')">Indietro</button>
+          <div class="spacer"></div>
+          <button class="btn primary" onclick="go('summary')">Vedi il riepilogo <span aria-hidden="true">→</span></button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. RIEPILOGO -->
+    <section class="screen" id="sc-summary" aria-labelledby="h-summary">
+      <div class="panel">
+        <p class="eyebrow">Passo 5 · Riepilogo</p>
+        <h2 class="sc" id="h-summary" tabindex="-1">Ecco cosa avrai</h2>
+        <p class="lead">Controlla e conferma. Poi comporremo la tua piattaforma.</p>
+        <ul class="sumlist" id="sumlist"></ul>
+        <div class="consent">
+          <input type="checkbox" id="sum-confirm">
+          <label for="sum-confirm">Confermo le funzioni e la durata della prova selezionate.</label>
+        </div>
+        <p class="err-msg" id="err-confirm" hidden><span aria-hidden="true">⚠</span> Spunta la conferma per proseguire.</p>
+        <div class="actions">
+          <button class="btn ghost" onclick="go('features')">Modifica</button>
+          <div class="spacer"></div>
+          <button class="btn primary" onclick="startCompose()">Componi la piattaforma <span aria-hidden="true">→</span></button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. COMPOSIZIONE -->
+    <section class="screen" id="sc-compose" aria-labelledby="h-compose">
+      <div class="panel">
+        <p class="eyebrow">Passo 6 · Composizione</p>
+        <h2 class="sc" id="h-compose" tabindex="-1">Stiamo componendo la tua piattaforma…</h2>
+        <div class="compose">
+          <div class="ringbig" role="img" id="composeRingImg" aria-label="Composizione allo 0 per cento">
+            <svg viewBox="0 0 120 120" aria-hidden="true">
+              <circle class="tk" cx="60" cy="60" r="52"/>
+              <circle class="fl" id="composeFill" cx="60" cy="60" r="52" stroke-dasharray="326.7" stroke-dashoffset="326.7"/>
+            </svg>
+            <div class="c"><span class="pc" id="composePc">0%</span></div>
+          </div>
+          <div class="barwrap">
+            <div class="bar"><i id="composeBar"></i></div>
+            <p class="cstatus" id="composeStatus" role="status" aria-live="polite">Prepariamo l'ambiente…</p>
+            <p class="ceta" id="composeEta">Di solito ci vogliono meno di 5 minuti.</p>
+          </div>
+          <div class="actions" id="composeError" style="justify-content:center;display:none">
+            <p class="err-msg" style="display:flex"><span aria-hidden="true">⚠</span> Qualcosa è andato storto durante la composizione.</p>
+            <button class="btn blue" onclick="startCompose()">Riprova</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7. TEMA -->
+    <section class="screen" id="sc-theme" aria-labelledby="h-theme">
+      <div class="panel">
+        <p class="eyebrow">Passo 7 · Aspetto</p>
+        <h2 class="sc" id="h-theme" tabindex="-1">Scegli colori e font</h2>
+        <p class="lead">Parti da una palette pronta, oppure componi la tua e carica i tuoi codici colore e il tuo font. Controlliamo per te che il testo resti leggibile (contrasto WCAG): la tua piattaforma deve restare accessibile qualunque cosa scegli.</p>
+        <div class="themegrid">
+          <div>
+            <h3>Palette</h3>
+            <div class="palettes" id="palettes" role="radiogroup" aria-label="Palette preconfezionate"></div>
+
+            <div class="custom">
+              <h3>Oppure componi la tua</h3>
+              <div class="colrow">
+                <div class="cc"><label for="c-primary">Primario</label><div class="ci"><input type="color" id="c-primary" value="#0C6CD3" oninput="syncHex('primary',this.value)" aria-label="Colore primario"><input type="text" id="h-primary" value="#0C6CD3" oninput="syncColor('primary',this.value)" aria-label="Codice colore primario"></div></div>
+                <div class="cc"><label for="c-accent">Accento</label><div class="ci"><input type="color" id="c-accent" value="#EF8216" oninput="syncHex('accent',this.value)" aria-label="Colore accento"><input type="text" id="h-accent" value="#EF8216" oninput="syncColor('accent',this.value)" aria-label="Codice colore accento"></div></div>
+              </div>
+              <div class="colrow">
+                <div class="cc"><label for="c-bg">Sfondo</label><div class="ci"><input type="color" id="c-bg" value="#FBF7EF" oninput="syncHex('bg',this.value)" aria-label="Colore sfondo"><input type="text" id="h-bg" value="#FBF7EF" oninput="syncColor('bg',this.value)" aria-label="Codice colore sfondo"></div></div>
+                <div class="cc"><label for="c-text">Testo</label><div class="ci"><input type="color" id="c-text" value="#211C18" oninput="syncHex('text',this.value)" aria-label="Colore testo"><input type="text" id="h-text" value="#211C18" oninput="syncColor('text',this.value)" aria-label="Codice colore testo"></div></div>
+              </div>
+
+              <h3>Font</h3>
+              <div class="fontrow" id="fontrow" role="radiogroup" aria-label="Font"></div>
+              <div class="uploadrow">
+                <label class="f" for="fontfile">Carica il tuo font (.woff2, .woff, .ttf, .otf)</label>
+                <input type="file" id="fontfile" accept=".woff2,.woff,.ttf,.otf" onchange="uploadFont(this)">
+                <p class="hint" id="fontUploadMsg"></p>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <h3>Anteprima live</h3>
+            <div class="preview" id="preview" aria-label="Anteprima della tua piattaforma">
+              <div class="pv-top"><b id="pvName">La tua piattaforma</b></div>
+              <div class="pv-body">
+                <h4>Buongiorno 👋</h4>
+                <p>Questa è un'anteprima dei tuoi colori e del tuo font. Un paragrafo di esempio per vedere come si legge il testo sullo sfondo scelto.</p>
+                <a class="pv-link" href="#" onclick="return false">Un link di esempio</a>
+                <div><span class="pv-btn">Un pulsante</span></div>
+              </div>
+            </div>
+            <div class="contrast ok" id="contrast" role="status" aria-live="polite"></div>
+          </div>
+        </div>
+        <div class="actions">
+          <button class="btn ghost" onclick="go('features')">Indietro</button>
+          <div class="spacer"></div>
+          <button class="btn primary" onclick="saveTheme()">Salva e vai <span aria-hidden="true">→</span></button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8. PRONTO -->
+    <section class="screen" id="sc-ready" aria-labelledby="h-ready">
+      <div class="panel">
+        <div class="toast"><span class="i" aria-hidden="true">✅</span><div><b>La tua piattaforma è pronta!</b><br>Abbiamo composto tutto con le funzioni e l'aspetto che hai scelto.</div></div>
+        <p class="eyebrow">Passo 8 · Pronto</p>
+        <h2 class="sc" id="h-ready" tabindex="-1">Benvenuta nella tua piattaforma</h2>
+        <p class="lead" id="readyLead"></p>
+        <h3>Le tue funzioni</h3>
+        <div class="modgrid" id="readyMods"></div>
+        <div class="actions">
+          <div class="spacer"></div>
+          <button class="btn primary" onclick="go('dashboard')">Entra e provala <span aria-hidden="true">→</span></button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 9. DASHBOARD / PROVA IN CORSO -->
+    <section class="screen" id="sc-dashboard" aria-labelledby="h-dash">
+      <div class="panel">
+        <p class="eyebrow">La tua piattaforma · prova in corso</p>
+        <h2 class="sc" id="h-dash" tabindex="-1">La tua dashboard</h2>
+        <p class="lead">Usa le funzioni come faresti davvero. Ogni azione consuma una parte del tuo tetto giornaliero. Con il pulsante <b>Avanza di un giorno</b> puoi simulare lo scorrere della prova.</p>
+
+        <div class="usebox">
+          <div class="usewrap">
+            <div><b id="useTitle">Uso di oggi</b> <span class="daychip" id="dayChip"></span></div>
+            <span class="daychip" id="trialLeftChip"></span>
+          </div>
+          <div class="usemeter" id="useMeter"><i></i></div>
+          <p class="hint" id="useHint" role="status" aria-live="polite"></p>
+          <p class="hint" id="lastUsed" role="status" aria-live="polite" style="min-height:18px;color:var(--primary);font-weight:600"></p>
+          <div class="actions" style="margin-top:8px">
+            <button class="btn blue" id="useBtn" onclick="useAction()">Usa una funzione a caso</button>
+            <button class="btn ghost" onclick="advanceDay()">Avanza di un giorno ⏭</button>
+            <div class="spacer"></div>
+            <button class="btn primary" onclick="openUpgrade()">Fai l'upgrade</button>
+          </div>
+        </div>
+
+        <h3>Le tue funzioni</h3>
+        <div class="modgrid" id="dashMods"></div>
+      </div>
+    </section>
+
+    <!-- 10. FINE PROVA -->
+    <section class="screen" id="sc-end" aria-labelledby="h-end">
+      <div class="panel">
+        <p class="eyebrow">Prova conclusa</p>
+        <h2 class="sc" id="h-end" tabindex="-1">La tua prova è finita</h2>
+        <p class="lead" id="endLead"></p>
+        <div class="actions">
+          <button class="btn ghost" id="extendBtn" onclick="extendTrial()">Prorroga la prova</button>
+          <div class="spacer"></div>
+          <button class="btn link" onclick="openWinback()">No, non voglio continuare</button>
+          <button class="btn primary" onclick="openUpgrade()">Passa alla versione completa <span aria-hidden="true">→</span></button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 11. UPGRADE OK -->
+    <section class="screen" id="sc-upok" aria-labelledby="h-upok">
+      <div class="panel" style="text-align:center">
+        <div style="font-size:52px" aria-hidden="true">🎉</div>
+        <h2 class="sc" id="h-upok" tabindex="-1">Benvenuta nella versione completa!</h2>
+        <p class="lead" style="margin:0 auto 20px">Nessun limite di uso giornaliero. Le tue funzioni, i tuoi dati e il tuo tema restano esattamente come li hai lasciati. Grazie per aver scelto AccessibilityToAll. 🧡</p>
+        <div class="actions" style="justify-content:center">
+          <button class="btn blue" onclick="go('dashboard')">Torna alla dashboard</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 12. WIN-BACK -->
+    <section class="screen" id="sc-winback" aria-labelledby="h-winback">
+      <div class="panel winback">
+        <div class="heart" aria-hidden="true">🧡</div>
+        <h2 class="sc" id="h-winback" tabindex="-1">Ci mancherai davvero.</h2>
+        <p class="lead" style="margin:0 auto 6px">Nessun problema: la porta resta aperta. Quello che hai costruito — funzioni, colori, dati — lo teniamo da parte. Se cambi idea, ritrovi tutto esattamente com'era.</p>
+
+        <div class="offer">
+          <b>Un'ultima cosa prima di andare</b>
+          <p style="margin:6px 0 12px;color:var(--ink-soft)">Vuoi ancora un po' di tempo per decidere con calma? Ti regaliamo <b>7 giorni in più</b> oppure uno sconto sul primo mese.</p>
+          <div class="actions" style="justify-content:center">
+            <button class="btn primary" onclick="winbackStay()">Sì, ci ripenso</button>
+          </div>
+        </div>
+
+        <div class="fbk">
+          <h3 id="fbk-h">Ci aiuti a capire? Cosa ti ha fatto scegliere di non restare?</h3>
+          <div role="radiogroup" aria-labelledby="fbk-h">
+            <label class="opt"><input type="radio" name="fbk" value="prezzo"> Costa troppo per me ora</label>
+            <label class="opt"><input type="radio" name="fbk" value="tempo"> Non ho avuto tempo di provarla bene</label>
+            <label class="opt"><input type="radio" name="fbk" value="funzione"> Mi mancava una funzione</label>
+            <label class="opt"><input type="radio" name="fbk" value="altro-cercavo"> Non era quello che cercavo</label>
+            <label class="opt"><input type="radio" name="fbk" value="altro"> Altro</label>
+          </div>
+        </div>
+
+        <div class="actions" style="justify-content:center">
+          <button class="btn ghost" onclick="winbackLeave()">Invia e esci</button>
+        </div>
+        <p class="hint" id="winbackThanks" role="status" style="margin-top:12px"></p>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="foot">AccessibilityToAll SRL · Prototipo accessibile (WCAG) · Compositore Versioni Clienti</footer>
+</div>
+
+<!-- POPUP UPGRADE -->
+<div class="overlay" id="ov-upgrade" role="dialog" aria-modal="true" aria-labelledby="ov-up-h">
+  <div class="modal">
+    <h2 id="ov-up-h">Ti stai avvicinando al limite di oggi</h2>
+    <p id="ov-up-p">Hai quasi usato tutte le azioni disponibili per oggi in questa prova. Con la versione completa non hai limiti: continui senza fermarti.</p>
+    <div class="actions">
+      <button class="btn ghost" onclick="closeOverlay('ov-upgrade')">Continua la prova</button>
+      <div class="spacer"></div>
+      <button class="btn primary" onclick="confirmUpgrade()">Fai l'upgrade</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* =========================================================
+   STATO
+========================================================= */
+var S = {
+  screen:'intro',
+  account:{name:'',email:''},
+  profile:null, uses:[],
+  trial:null,           // 7 | 15 | 30
+  features:{},          // {fnId:true}
+  theme:{primary:'#0C6CD3',accent:'#EF8216',bg:'#FBF7EF',text:'#211C18',font:'inter',fontLabel:'Inter'},
+  day:1, usedToday:0, extended:false, active:false
+};
+
+var PLANS = {7:{days:7,cap:50},15:{days:15,cap:25},30:{days:30,cap:12}};
+var WARN_AT = 0.8;
+
+/* Profili tipo -> gruppi consigliati */
+var PROFILES = [
+  {id:'agenzia', t:'Agenzia web / comunicazione', d:'Fai siti, contenuti o marketing per altri.', groups:['acc','con','crm']},
+  {id:'ecommerce', t:'E-commerce / negozio online', d:'Vendi online e curi il tuo store.', groups:['acc','con','aut']},
+  {id:'pa', t:'PA / ente pubblico', d:'Sito e documenti di un ente o della PA.', groups:['acc','doc']},
+  {id:'pro', t:'Libero professionista', d:'Consulente, studio, attività individuale.', groups:['acc','crm','for']},
+  {id:'formatore', t:'Formatore / educatore', d:'Corsi, lezioni, materiali didattici.', groups:['for','con','doc']},
+  {id:'espositore', t:'Vai in fiera / raccogli lead', d:'Eventi, stand, contatti da coltivare.', groups:['fie','crm','con']}
+];
+var USES = [
+  {id:'conformita', t:'Mettermi in regola (EAA/WCAG)'},
+  {id:'contenuti', t:'Produrre contenuti accessibili'},
+  {id:'clienti', t:'Trovare e gestire clienti'},
+  {id:'formazione', t:'Formare me o il mio team'},
+  {id:'automatizzare', t:'Automatizzare attività ripetitive'}
+];
+
+/* Catalogo gruppi + funzioni. dep = id gruppo richiesto */
+var GROUPS = [
+  {id:'acc', t:'Accessibilità', fns:[
+    {id:'audit-sito', x:'Audit sito web', d:'Analisi WCAG di una pagina o sito.'},
+    {id:'audit-doc', x:'Audit documenti', d:'Controllo di PDF, Word, presentazioni.'},
+    {id:'audit-app', x:'Audit app mobile', d:'Verifica di app iOS/Android.'},
+    {id:'migliora-sito', x:'Correggi sito', d:'Versione accessibile della pagina.'},
+    {id:'report-wcag', x:'Report WCAG', d:'Piano di conformità e remediation.'},
+    {id:'monitor-eaa', x:'Monitoraggio EAA', d:'Controllo ricorrente nel tempo.'}
+  ]},
+  {id:'con', t:'Contenuti & Social', fns:[
+    {id:'post', x:'Post accessibili', d:'Testi social con alt e linguaggio inclusivo.'},
+    {id:'ped', x:'Calendario editoriale', d:'Piano dei contenuti della settimana.'},
+    {id:'reel', x:'Reel & video', d:'Script, sottotitoli, accorgimenti.'},
+    {id:'immagini', x:'Immagini & caroselli', d:'Grafiche con alt text.'},
+    {id:'repurpose', x:'Repurposing', d:'Un contenuto declinato su più canali.'}
+  ]},
+  {id:'fie', t:'Fiere & Lead', dep:'crm', fns:[
+    {id:'raccogli', x:'Raccogli contatti', d:'Da biglietti e volantini a lista.'},
+    {id:'analisi-fiera', x:'Analisi fiera', d:'Studio espositori e opportunità.'},
+    {id:'target', x:'Seleziona target', d:'Ordina i contatti per priorità.'},
+    {id:'email-opp', x:'Email opportunità', d:'Follow-up dopo l\'incontro.'}
+  ]},
+  {id:'crm', t:'CRM & Commerciale', fns:[
+    {id:'contatti', x:'Rubrica contatti', d:'Anagrafica clienti e lead.'},
+    {id:'proposta', x:'Proposte commerciali', d:'Documento di offerta persuasivo.'},
+    {id:'preventivo', x:'Preventivi', d:'Pacchetti e prezzi.'},
+    {id:'outreach', x:'Outreach a freddo', d:'Email personalizzate ai prospect.'}
+  ]},
+  {id:'for', t:'Formazione', fns:[
+    {id:'curriculum', x:'Curriculum corsi', d:'Percorsi a livelli.'},
+    {id:'attestati', x:'Attestati', d:'Certificati di partecipazione.'},
+    {id:'quiz', x:'Quiz & verifiche', d:'Test per gli allievi.'},
+    {id:'slide', x:'Slide & materiali', d:'Supporti per le lezioni.'}
+  ]},
+  {id:'doc', t:'Documenti', fns:[
+    {id:'riassunto', x:'Riassunti', d:'Takeaway da un documento.'},
+    {id:'trascrivi', x:'Trascrizioni & sottotitoli', d:'Da audio/video a testo accessibile.'},
+    {id:'capitolato', x:'Capitolati & clausole', d:'Requisiti di accessibilità per gare.'}
+  ]},
+  {id:'aut', t:'Automazioni & AI', dep:'acc', fns:[
+    {id:'agenti', x:'Agenti AI', d:'Ruoli automatizzati (social, marketing…).'},
+    {id:'instradatore', x:'Instradatore AI', d:'Sceglie il modello migliore per il compito.'},
+    {id:'hooks', x:'Controlli automatici', d:'Check di accessibilità prima di pubblicare.'},
+    {id:'notifiche', x:'Centro notifiche', d:'Avvisi e promemoria con suono.'}
+  ]},
+  {id:'rel', t:'', fns:[]} // placeholder non usato
+];
+GROUPS = GROUPS.filter(function(g){return g.id!=='rel';});
+var PALETTES = [
+  {id:'classica', n:'A2A Classica', primary:'#0C6CD3', accent:'#EF8216', bg:'#FBF7EF', text:'#211C18'},
+  {id:'notte', n:'Notte', primary:'#4E92D6', accent:'#F4C20D', bg:'#0E1B2A', text:'#EAF1FB'},
+  {id:'bosco', n:'Bosco', primary:'#2E7D6B', accent:'#E08A2C', bg:'#F3F7F4', text:'#16241F'},
+  {id:'prugna', n:'Prugna', primary:'#7A3E7A', accent:'#E6A817', bg:'#F7F2F7', text:'#241623'},
+  {id:'sabbia', n:'Sabbia', primary:'#A9662B', accent:'#2C7DA0', bg:'#FBF6EE', text:'#2A2016'},
+  {id:'ghiaccio', n:'Ghiaccio', primary:'#1E5F9E', accent:'#D9534F', bg:'#F4F8FC', text:'#152230'}
+];
+var FONTS = [
+  {id:'inter', n:'Inter', css:'"Inter",system-ui,sans-serif'},
+  {id:'fraunces', n:'Fraunces', css:'"Fraunces",Georgia,serif'},
+  {id:'atkinson', n:'Atkinson Hyperlegible', css:'"Atkinson Hyperlegible",system-ui,sans-serif'},
+  {id:'system', n:'Sistema', css:'system-ui,-apple-system,"Segoe UI",sans-serif'}
+];
+
+var STEP_ORDER = ['account','profile','trial','features','summary','compose','theme','ready'];
+var STEP_LABELS = {account:'Account',profile:'Profilo',trial:'Prova',features:'Funzioni',summary:'Riepilogo',compose:'Composizione',theme:'Aspetto',ready:'Pronto'};
+
+/* =========================================================
+   NAVIGAZIONE
+========================================================= */
+function go(id){
+  S.screen = id;
+  document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});
+  var el = document.getElementById('sc-'+id);
+  el.classList.add('active');
+  renderStepper();
+  updateTrialTag();
+  // focus sul titolo della schermata
+  var h = el.querySelector('[id^="h-"]');
+  if(h){ h.focus(); }
+  window.scrollTo({top:0,behavior:'smooth'});
+  if(id==='profile') renderProfile();
+  if(id==='trial') renderTrials();
+  if(id==='features') renderCatalog();
+  if(id==='summary') renderSummary();
+  if(id==='theme') renderTheme();
+  if(id==='ready') renderReady();
+  if(id==='dashboard') renderDashboard();
+  if(id==='end') renderEnd();
+}
+function renderStepper(){
+  var ol = document.getElementById('stepper');
+  var curIdx = STEP_ORDER.indexOf(S.screen);
+  ol.innerHTML = STEP_ORDER.map(function(k,i){
+    var cls = 'sc'; var idx = STEP_ORDER.indexOf(S.screen);
+    var state = i<idx ? 'done' : (i===idx ? 'current' : '');
+    return '<li><span class="s '+state+'"><span class="n" aria-hidden="true">'+(i<idx?'✓':(i+1))+'</span>'+STEP_LABELS[k]+'</span></li>';
+  }).join('');
+}
+function updateTrialTag(){
+  var tag = document.getElementById('trialtag');
+  if(S.active && S.trial){
+    var left = PLANS[S.trial].days - S.day + 1;
+    tag.hidden=false;
+    tag.textContent = 'Prova '+S.trial+'gg · giorno '+S.day+' di '+PLANS[S.trial].days;
+  } else { tag.hidden=true; }
+}
+
+/* =========================================================
+   1. ACCOUNT
+========================================================= */
+function submitAccount(){
+  var name=document.getElementById('acc-name').value.trim();
+  var email=document.getElementById('acc-email').value.trim();
+  var pass=document.getElementById('acc-pass').value;
+  var consent=document.getElementById('acc-consent').checked;
+  var ok=true;
+  toggleErr('err-name', !name); if(!name) ok=false;
+  var emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  toggleErr('err-email', !emailOk); if(!emailOk) ok=false;
+  toggleErr('err-pass', pass.length<6); if(pass.length<6) ok=false;
+  toggleErr('err-consent', !consent); if(!consent) ok=false;
+  if(!ok){ // focus primo errore
+    var first=document.querySelector('.err-msg:not([hidden])');
+    if(first){ var fld=first.previousElementSibling; if(fld&&fld.focus) fld.focus(); }
+    return;
+  }
+  S.account={name:name,email:email};
+  go('profile');
+}
+function toggleErr(id,show){ document.getElementById(id).hidden=!show; }
+
+/* =========================================================
+   2. PROFILAZIONE
+========================================================= */
+function renderProfile(){
+  var pc=document.getElementById('profileCards');
+  pc.innerHTML = PROFILES.map(function(p){
+    var sel = S.profile===p.id;
+    return '<label class="card-check'+(sel?' sel':'')+'"><input type="radio" name="profile" value="'+p.id+'" '+(sel?'checked':'')+' onchange="pickProfile(\''+p.id+'\')"><span class="t">'+p.t+'</span><span class="d">'+p.d+'</span></label>';
+  }).join('');
+  var uc=document.getElementById('useCards');
+  uc.innerHTML = USES.map(function(u){
+    var sel = S.uses.indexOf(u.id)>=0;
+    return '<label class="card-check'+(sel?' sel':'')+'"><input type="checkbox" value="'+u.id+'" '+(sel?'checked':'')+' onchange="toggleUse(\''+u.id+'\')"><span class="t">'+u.t+'</span></label>';
+  }).join('');
+  refreshProfileNext();
+}
+function pickProfile(id){ S.profile=id; renderProfile(); }
+function toggleUse(id){ var i=S.uses.indexOf(id); if(i>=0)S.uses.splice(i,1); else S.uses.push(id); renderProfile(); }
+function refreshProfileNext(){ document.getElementById('profileNext').disabled = !S.profile; }
+function submitProfile(){
+  if(!S.profile) return;
+  // pre-seleziona i gruppi consigliati -> attiva le funzioni di quei gruppi
+  var prof = PROFILES.find(function(p){return p.id===S.profile;});
+  S.features={};
+  prof.groups.forEach(function(gid){ activateGroup(gid,false); });
+  resolveDeps();
+  go('trial');
+}
+
+/* =========================================================
+   3. PROVA
+========================================================= */
+function renderTrials(){
+  var tc=document.getElementById('trialCards');
+  tc.innerHTML = Object.keys(PLANS).map(function(k){
+    var p=PLANS[k]; var sel=String(S.trial)===String(k);
+    var lvl = k==='7'?'Uso alto':(k==='15'?'Uso medio':'Uso basso');
+    var noext = k==='30' ? '<p class="noext">Nessuna proroga disponibile</p>' : '<p class="note">Prorogabile una volta a fine prova</p>';
+    return '<div class="trial'+(sel?' sel':'')+'" role="radio" aria-checked="'+sel+'" tabindex="0" onclick="pickTrial('+k+')" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();pickTrial('+k+')}">'+
+      '<div class="days">'+p.days+'</div><div class="u">giorni · '+lvl+'</div>'+
+      '<div class="cap"><b>'+p.cap+'</b><br>azioni al giorno</div>'+noext+'</div>';
+  }).join('');
+  document.getElementById('trialNext').disabled = !S.trial;
+  var b=document.getElementById('trialBalance');
+  if(S.trial){ var pl=PLANS[S.trial]; b.textContent='Scelta: '+pl.days+' giorni, fino a '+pl.cap+' azioni al giorno ('+(pl.days*pl.cap)+' azioni in totale al massimo).'; }
+  else b.textContent='';
+}
+function pickTrial(k){ S.trial=Number(k); renderTrials(); }
+function submitTrial(){ if(!S.trial) return; go('features'); }
+
+/* =========================================================
+   4. FUNZIONI
+========================================================= */
+function groupById(id){ return GROUPS.find(function(g){return g.id===id;}); }
+function isGroupActive(g){ return g.fns.every(function(f){return S.features[f.id];}); }
+function isGroupPartly(g){ return g.fns.some(function(f){return S.features[f.id];}); }
+function activateGroup(gid,resolve){ var g=groupById(gid); if(!g)return; g.fns.forEach(function(f){S.features[f.id]=true;}); if(resolve!==false) resolveDeps(); }
+function deactivateGroup(gid){ var g=groupById(gid); if(!g)return; g.fns.forEach(function(f){delete S.features[f.id];}); }
+function suggestedGroups(){ var prof=PROFILES.find(function(p){return p.id===S.profile;}); return prof?prof.groups:[]; }
+
+/* dipendenze: se un gruppo con dep ha almeno una funzione attiva, il gruppo dep viene attivato */
+var lastDep = null;
+function resolveDeps(){
+  lastDep=null;
+  GROUPS.forEach(function(g){
+    if(g.dep && isGroupPartly(g) && !isGroupActive(groupById(g.dep))){
+      activateGroup(g.dep,false);
+      lastDep = {need:g.dep, by:g.id};
+    }
+  });
+}
+function renderCatalog(){
+  var q=(document.getElementById('fsearch').value||'').toLowerCase();
+  var sugg=suggestedGroups();
+  var host=document.getElementById('catalog');
+  host.innerHTML = GROUPS.map(function(g){
+    var fns = g.fns.filter(function(f){ return !q || f.x.toLowerCase().indexOf(q)>=0 || f.d.toLowerCase().indexOf(q)>=0; });
+    if(q && fns.length===0) return '';
+    var active=isGroupActive(g), partly=isGroupPartly(g);
+    var activeCount=g.fns.filter(function(f){return S.features[f.id];}).length;
+    var depTxt = g.dep ? '<div class="dep">Richiede il gruppo «'+groupById(g.dep).t+'»</div>' : '';
+    var openCls = (q||partly)?' open':'';
+    var head = '<div class="grp-head">'+
+      '<input type="checkbox" class="sw" '+(active?'checked':'')+(partly&&!active?' aria-checked="mixed"':'')+' aria-label="Attiva tutto il gruppo '+g.t+'" onchange="toggleGroup(\''+g.id+'\',this.checked)">'+
+      '<span class="gt">'+g.t+'</span>'+
+      (sugg.indexOf(g.id)>=0?'<span class="suggested">Consigliato</span>':'')+
+      '<span class="gc">'+activeCount+'/'+g.fns.length+'</span>'+
+      '<button type="button" class="toggle-body" aria-expanded="'+(openCls?'true':'false')+'" onclick="toggleBody(this)">Dettagli</button>'+
+      '</div>';
+    var body = '<div class="grp-body">'+depTxt+ fns.map(function(f){
+      return '<div class="fn"><input type="checkbox" id="fn-'+f.id+'" '+(S.features[f.id]?'checked':'')+' onchange="toggleFn(\''+f.id+'\',this.checked)">'+
+        '<label for="fn-'+f.id+'"><span class="fx">'+f.x+'</span><span class="fd"> — '+f.d+'</span></label></div>';
+    }).join('')+'</div>';
+    return '<div class="grp'+openCls+'">'+head+body+'</div>';
+  }).join('');
+  var n=Object.keys(S.features).filter(function(k){return S.features[k];}).length;
+  document.getElementById('featCount').textContent = n+' funzion'+(n===1?'e':'i')+' attiv'+(n===1?'a':'e');
+  if(lastDep){ announce('Ho attivato anche il gruppo «'+groupById(lastDep.need).t+'», richiesto da «'+groupById(lastDep.by).t+'».'); }
+}
+function toggleGroup(gid,on){ if(on) activateGroup(gid); else { deactivateGroup(gid); resolveDeps(); } renderCatalog(); }
+function toggleFn(fid,on){ if(on)S.features[fid]=true; else delete S.features[fid]; resolveDeps(); renderCatalog(); }
+function toggleBody(btn){ var grp=btn.closest('.grp'); grp.classList.toggle('open'); btn.setAttribute('aria-expanded', grp.classList.contains('open')); }
+
+/* =========================================================
+   5. RIEPILOGO
+========================================================= */
+function activeGroupsList(){
+  return GROUPS.filter(isGroupPartly).map(function(g){
+    var n=g.fns.filter(function(f){return S.features[f.id];}).length; return {t:g.t,n:n,tot:g.fns.length};
+  });
+}
+function renderSummary(){
+  var pl=PLANS[S.trial]||PLANS[7];
+  var grps=activeGroupsList();
+  var nFns=Object.keys(S.features).filter(function(k){return S.features[k];}).length;
+  var prof=PROFILES.find(function(p){return p.id===S.profile;});
+  var html='';
+  html+='<li><span class="k">Account</span><span class="v">'+esc(S.account.name)+' · '+esc(S.account.email)+'</span></li>';
+  html+='<li><span class="k">Profilo</span><span class="v">'+(prof?prof.t:'')+'</span></li>';
+  html+='<li><span class="k">Prova</span><span class="v">'+pl.days+' giorni · '+pl.cap+' azioni/giorno'+(S.trial===30?' · senza proroga':' · prorogabile')+'</span></li>';
+  html+='<li><span class="k">Gruppi attivi</span><span class="v"><span class="chips">'+grps.map(function(g){return '<span class="chip">'+g.t+' ('+g.n+'/'+g.tot+')</span>';}).join('')+'</span></span></li>';
+  html+='<li><span class="k">Funzioni totali</span><span class="v">'+nFns+'</span></li>';
+  document.getElementById('sumlist').innerHTML=html;
+  document.getElementById('sum-confirm').checked=false;
+  document.getElementById('err-confirm').hidden=true;
+}
+function startCompose(){
+  if(S.screen==='summary'){
+    if(!document.getElementById('sum-confirm').checked){ document.getElementById('err-confirm').hidden=false; return; }
+  }
+  go('compose');
+  runCompose();
+}
+
+/* =========================================================
+   6. COMPOSIZIONE (barra + %)
+========================================================= */
+var composeTimer=null;
+var COMPOSE_STEPS=[
+  'Prepariamo l\'ambiente…',
+  'Attiviamo le funzioni scelte…',
+  'Colleghiamo le dipendenze…',
+  'Isoliamo i tuoi dati in sicurezza…',
+  'Applichiamo l\'accessibilità di base…',
+  'Ultimi ritocchi…'
+];
+function runCompose(){
+  clearInterval(composeTimer);
+  document.getElementById('composeError').style.display='none';
+  var pc=0; var fill=document.getElementById('composeFill'); var C=2*Math.PI*52;
+  fill.setAttribute('stroke-dasharray', C.toFixed(1));
+  var t0=Date.now();
+  composeTimer=setInterval(function(){
+    pc += Math.random()*7+3;
+    if(pc>100)pc=100;
+    var r=Math.round(pc);
+    document.getElementById('composePc').textContent=r+'%';
+    document.getElementById('composeBar').style.width=r+'%';
+    fill.setAttribute('stroke-dashoffset', (C*(1-pc/100)).toFixed(1));
+    document.getElementById('composeRingImg').setAttribute('aria-label','Composizione al '+r+' per cento');
+    var si=Math.min(COMPOSE_STEPS.length-1, Math.floor(pc/100*COMPOSE_STEPS.length));
+    document.getElementById('composeStatus').textContent=COMPOSE_STEPS[si];
+    if(pc>=100){
+      clearInterval(composeTimer);
+      document.getElementById('composeStatus').textContent='Fatto! La tua piattaforma è pronta.';
+      setTimeout(function(){ go('theme'); }, 600);
+    }
+  }, 260);
+}
+
+/* =========================================================
+   7. TEMA
+========================================================= */
+function renderTheme(){
+  var host=document.getElementById('palettes');
+  host.innerHTML=PALETTES.map(function(p){
+    var sel = S.theme.primary===p.primary && S.theme.bg===p.bg;
+    return '<div class="pal'+(sel?' sel':'')+'" role="radio" aria-checked="'+sel+'" tabindex="0" onclick="applyPalette(\''+p.id+'\')" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();applyPalette(\''+p.id+'\')}">'+
+      '<div class="sws"><span style="background:'+p.primary+'"></span><span style="background:'+p.accent+'"></span><span style="background:'+p.bg+'"></span><span style="background:'+p.text+'"></span></div>'+
+      '<div class="pn">'+p.n+'</div></div>';
+  }).join('');
+  var fr=document.getElementById('fontrow');
+  fr.innerHTML=FONTS.map(function(f){
+    var sel=S.theme.font===f.id;
+    return '<button type="button" class="fontchip'+(sel?' sel':'')+'" role="radio" aria-checked="'+sel+'" style="font-family:'+f.css+'" onclick="pickFont(\''+f.id+'\')">'+f.n+'</button>';
+  }).join('');
+  document.getElementById('pvName').textContent = S.account.name ? ('Piattaforma di '+S.account.name.split(' ')[0]) : 'La tua piattaforma';
+  setColorInputs(); applyPreview();
+}
+function applyPalette(id){ var p=PALETTES.find(function(x){return x.id===id;}); if(!p)return;
+  S.theme.primary=p.primary;S.theme.accent=p.accent;S.theme.bg=p.bg;S.theme.text=p.text; setColorInputs(); applyPreview(); renderTheme(); }
+function setColorInputs(){
+  ['primary','accent','bg','text'].forEach(function(k){
+    document.getElementById('c-'+k).value=S.theme[k];
+    document.getElementById('h-'+k).value=S.theme[k];
+  });
+}
+function syncHex(k,v){ S.theme[k]=v; document.getElementById('h-'+k).value=v; applyPreview(); markCustomPalette(); }
+function syncColor(k,v){ v=v.trim(); if(/^#?[0-9a-fA-F]{6}$/.test(v)){ if(v[0]!=='#')v='#'+v; S.theme[k]=v; document.getElementById('c-'+k).value=v; applyPreview(); markCustomPalette(); } }
+function markCustomPalette(){ document.querySelectorAll('.pal').forEach(function(el){el.classList.remove('sel');el.setAttribute('aria-checked','false');}); }
+function pickFont(id){ var f=FONTS.find(function(x){return x.id===id;}); S.theme.font=id; S.theme.fontLabel=f.n; S.theme.fontCss=f.css; applyPreview(); renderTheme(); }
+function uploadFont(input){
+  var file=input.files[0]; if(!file)return;
+  var name=file.name.replace(/\.(woff2?|ttf|otf)$/i,'');
+  var url=URL.createObjectURL(file);
+  try{
+    var ff=new FontFace('UserFont_'+Date.now(), 'url('+url+')');
+    ff.load().then(function(loaded){
+      document.fonts.add(loaded);
+      S.theme.font='user'; S.theme.fontLabel=name; S.theme.fontCss='"'+loaded.family+'",system-ui,sans-serif';
+      document.getElementById('fontUploadMsg').textContent='Font «'+name+'» caricato e applicato.';
+      // deseleziona i chip
+      document.querySelectorAll('.fontchip').forEach(function(c){c.classList.remove('sel');c.setAttribute('aria-checked','false');});
+      applyPreview();
+    }).catch(function(){ document.getElementById('fontUploadMsg').textContent='Non sono riuscito a leggere questo font, prova con un altro file.'; });
+  }catch(e){ document.getElementById('fontUploadMsg').textContent='Formato non supportato dal browser.'; }
+}
+function applyPreview(){
+  var pv=document.getElementById('preview');
+  var fontCss = S.theme.fontCss || (FONTS.find(function(f){return f.id===S.theme.font;})||{}).css || 'var(--body)';
+  pv.style.setProperty('--pv-primary',S.theme.primary);
+  pv.style.setProperty('--pv-accent',S.theme.accent);
+  pv.style.setProperty('--pv-bg',S.theme.bg);
+  pv.style.setProperty('--pv-text',S.theme.text);
+  pv.style.setProperty('--pv-btn-text',bestTextOn(S.theme.accent));
+  pv.style.setProperty('--pv-font',fontCss);
+  checkContrast();
+}
+/* Contrasto WCAG */
+function luminance(hex){
+  hex=hex.replace('#',''); if(hex.length===3)hex=hex.split('').map(function(c){return c+c;}).join('');
+  var r=parseInt(hex.substr(0,2),16)/255, g=parseInt(hex.substr(2,2),16)/255, b=parseInt(hex.substr(4,2),16)/255;
+  [r,g,b]=[r,g,b].map(function(c){return c<=0.03928?c/12.92:Math.pow((c+0.055)/1.055,2.4);});
+  return 0.2126*r+0.7152*g+0.0722*b;
+}
+function contrastRatio(a,b){ var L1=luminance(a),L2=luminance(b); var hi=Math.max(L1,L2),lo=Math.min(L1,L2); return (hi+0.05)/(lo+0.05); }
+function bestTextOn(bg){ return contrastRatio('#ffffff',bg) >= contrastRatio('#111111',bg) ? '#ffffff' : '#111111'; }
+function checkContrast(){
+  var box=document.getElementById('contrast');
+  var rText=contrastRatio(S.theme.text,S.theme.bg);
+  var btnText=bestTextOn(S.theme.accent);
+  var rBtn=contrastRatio(btnText,S.theme.accent);
+  var okText=rText>=4.5, okBtn=rBtn>=3;
+  var ok = okText && okBtn;
+  box.className='contrast '+(ok?'ok':'bad');
+  var msg='';
+  if(ok){ msg='<span aria-hidden="true">✔</span><div>Contrasto buono. Testo su sfondo: <span class="val">'+rText.toFixed(2)+':1</span> (serve almeno 4.5:1).</div>'; }
+  else{
+    var probs=[];
+    if(!okText) probs.push('testo/sfondo '+rText.toFixed(2)+':1 (min 4.5:1)');
+    if(!okBtn) probs.push('testo sul pulsante '+rBtn.toFixed(2)+':1 (min 3:1)');
+    msg='<span aria-hidden="true">⚠</span><div>Attenzione al contrasto: '+probs.join(' · ')+'. Scurisci il testo o schiarisci lo sfondo per restare accessibile.</div>';
+  }
+  box.innerHTML=msg;
+  S.theme.contrastOk=ok;
+}
+function saveTheme(){ go('ready'); }
+
+/* =========================================================
+   8. PRONTO
+========================================================= */
+function activeFnsFlat(){
+  var out=[]; GROUPS.forEach(function(g){ g.fns.forEach(function(f){ if(S.features[f.id]) out.push({g:g.t,x:f.x}); }); }); return out;
+}
+function renderReady(){
+  S.active=true; S.day=1; S.usedToday=0; S.extended=false;
+  var pl=PLANS[S.trial]||PLANS[7];
+  document.getElementById('readyLead').textContent='Hai '+pl.days+' giorni di prova, fino a '+pl.cap+' azioni al giorno. Quando ti avvicini al tetto ti proponiamo l\'upgrade; a fine prova potrai '+(S.trial===30?'passare alla versione completa':'prorogare o passare alla versione completa')+'.';
+  var mods=activeFnsFlat();
+  document.getElementById('readyMods').innerHTML=mods.map(function(m){return '<div class="mod"><div class="mt">'+m.x+'</div><div class="mf">'+m.g+'</div></div>';}).join('');
+  updateTrialTag();
+}
+
+/* =========================================================
+   9. DASHBOARD / SIMULAZIONE PROVA
+========================================================= */
+function renderDashboard(){
+  S.active=true; updateTrialTag();
+  var pl=PLANS[S.trial]||PLANS[7];
+  document.getElementById('dayChip').textContent='giorno '+S.day+' di '+pl.days;
+  document.getElementById('trialLeftChip').textContent=(pl.days-S.day+1)+' giorni rimasti';
+  var mods=activeFnsFlat(); S._mods=mods;
+  document.getElementById('dashMods').innerHTML=mods.map(function(m,i){
+    return '<button type="button" class="mod usable" onclick="useFeature('+i+')" aria-label="Usa la funzione '+m.x+'">'+
+      '<span class="mt">'+m.x+'</span><span class="mf">'+m.g+'</span><span class="usehint2">Tocca per usarla →</span></button>';
+  }).join('');
+  document.getElementById('lastUsed').textContent='';
+  refreshUseMeter();
+}
+function useFeature(i){
+  var pl=PLANS[S.trial]||PLANS[7];
+  var m=(S._mods||[])[i]; if(!m) return;
+  if(S.usedToday>=pl.cap){ refreshUseMeter(); flashUse('Tetto di oggi raggiunto ('+pl.cap+' azioni). Torna domani o passa alla versione completa.'); openUpgrade(); return; }
+  S.usedToday++;
+  refreshUseMeter();
+  flashUse('Hai usato «'+m.x+'» ✓ — azioni di oggi: '+S.usedToday+'/'+pl.cap+'.');
+  spendPulse(i);
+  var frac=S.usedToday/pl.cap;
+  if(frac>=WARN_AT && frac<1 && !S._warnedToday){ S._warnedToday=true; openUpgrade(); }
+}
+function spendPulse(i){
+  try{ var cards=document.querySelectorAll('#dashMods .mod'); var el=cards[i]; if(el){ el.classList.remove('spent'); void el.offsetWidth; el.classList.add('spent'); } }catch(e){}
+}
+function flashUse(msg){ var el=document.getElementById('lastUsed'); if(el){ el.textContent=msg; } announce(msg); }
+function refreshUseMeter(){
+  var pl=PLANS[S.trial]||PLANS[7]; var frac=S.usedToday/pl.cap;
+  var meter=document.getElementById('useMeter'); var fillEl=meter.querySelector('i');
+  fillEl.style.width=Math.min(100,frac*100)+'%';
+  meter.classList.toggle('warn', frac>=WARN_AT && frac<1);
+  meter.classList.toggle('full', frac>=1);
+  var hint=document.getElementById('useHint');
+  var btn=document.getElementById('useBtn');
+  if(frac>=1){ hint.textContent='Hai raggiunto il tetto di oggi ('+pl.cap+' azioni). Torna domani, oppure passa alla versione completa per continuare subito.'; btn.disabled=true; }
+  else { hint.textContent='Usate '+S.usedToday+' di '+pl.cap+' azioni di oggi.'; btn.disabled=false; }
+}
+function useAction(){
+  var pl=PLANS[S.trial]||PLANS[7];
+  if(S.usedToday>=pl.cap){ flashUse('Tetto di oggi raggiunto ('+pl.cap+' azioni). Torna domani o passa alla versione completa.'); return; }
+  S.usedToday++;
+  refreshUseMeter();
+  flashUse('Hai usato una funzione ✓ — azioni di oggi: '+S.usedToday+'/'+pl.cap+'.');
+  var frac=S.usedToday/pl.cap;
+  if(frac>=WARN_AT && frac<1 && !S._warnedToday){ S._warnedToday=true; openUpgrade(); }
+}
+function advanceDay(){
+  var pl=PLANS[S.trial];
+  if(S.day>=pl.days){ go('end'); return; }
+  S.day++; S.usedToday=0; S._warnedToday=false;
+  if(S.day>pl.days){ go('end'); return; }
+  updateTrialTag(); renderDashboard();
+  announce('Ora è il giorno '+S.day+'. Il tetto di oggi è di nuovo pieno.');
+  if(S.day>=pl.days){ announce('Ultimo giorno di prova.'); }
+}
+/* Popup upgrade */
+function openUpgrade(){ openOverlay('ov-upgrade'); }
+function confirmUpgrade(){ closeOverlay('ov-upgrade'); go('upok'); S.active=false; updateTrialTag(); }
+function openOverlay(id){ var o=document.getElementById(id); o.classList.add('on'); o._returnFocus=document.activeElement; var f=o.querySelector('button'); if(f)f.focus(); document.addEventListener('keydown',escClose); }
+function closeOverlay(id){ var o=document.getElementById(id); o.classList.remove('on'); if(o._returnFocus&&o._returnFocus.focus)o._returnFocus.focus(); document.removeEventListener('keydown',escClose); }
+function escClose(e){ if(e.key==='Escape'){ document.querySelectorAll('.overlay.on').forEach(function(o){o.classList.remove('on');}); } }
+
+/* =========================================================
+   10. FINE PROVA
+========================================================= */
+function renderEnd(){
+  var pl=PLANS[S.trial]||PLANS[7];
+  var canExtend = S.trial!==30 && !S.extended;
+  document.getElementById('extendBtn').style.display = canExtend ? '' : 'none';
+  var lead;
+  if(S.trial===30){ lead='I tuoi 30 giorni di prova sono finiti. Per continuare puoi passare alla versione completa — la proroga non è prevista per la prova da 30 giorni.'; }
+  else if(S.extended){ lead='Anche la proroga è finita. Per continuare passa alla versione completa.'; }
+  else { lead='I tuoi '+pl.days+' giorni di prova sono finiti. Puoi prorogare una volta, oppure passare alla versione completa.'; }
+  document.getElementById('endLead').textContent=lead;
+}
+function extendTrial(){
+  if(S.trial===30 || S.extended) return;
+  S.extended=true;
+  PLANS[S.trial]={days:PLANS[S.trial].days+7, cap:PLANS[S.trial].cap}; // proroga di 7 giorni
+  S.day=S.day; S.usedToday=0; S._warnedToday=false; S.active=true;
+  announce('Prova prorogata di 7 giorni.');
+  go('dashboard');
+}
+
+/* =========================================================
+   12. WIN-BACK
+========================================================= */
+function openWinback(){ go('winback'); }
+function winbackStay(){ // ultima offerta accettata: +7 giorni
+  if(!S.extended && S.trial!==30){ S.extended=true; PLANS[S.trial]={days:PLANS[S.trial].days+7,cap:PLANS[S.trial].cap}; }
+  else { S.day=1; }
+  S.usedToday=0; S._warnedToday=false; S.active=true;
+  announce('Bentornata! Hai ancora tempo per decidere.');
+  go('dashboard');
+}
+function winbackLeave(){
+  var sel=document.querySelector('input[name="fbk"]:checked');
+  document.getElementById('winbackThanks').textContent = 'Grazie del tuo tempo'+(sel?' e del tuo riscontro':'')+'. Se un domani vorrai tornare, ti bastano pochi secondi. Ti auguriamo il meglio. 🧡';
+}
+
+/* =========================================================
+   UTIL
+========================================================= */
+function esc(s){return String(s==null?'':s).replace(/[<>&]/g,function(c){return{'<':'&lt;','>':'&gt;','&':'&amp;'}[c];});}
+var liveRegion=null;
+function announce(msg){
+  if(!liveRegion){ liveRegion=document.createElement('div'); liveRegion.className='sr'; liveRegion.setAttribute('aria-live','polite'); document.body.appendChild(liveRegion); }
+  liveRegion.textContent=''; setTimeout(function(){ liveRegion.textContent=msg; }, 60);
+}
+function resetAll(){
+  S={screen:'intro',account:{name:'',email:''},profile:null,uses:[],trial:null,features:{},
+     theme:{primary:'#0C6CD3',accent:'#EF8216',bg:'#FBF7EF',text:'#211C18',font:'inter',fontLabel:'Inter'},
+     day:1,usedToday:0,extended:false,active:false};
+  PLANS={7:{days:7,cap:50},15:{days:15,cap:25},30:{days:30,cap:12}};
+  document.getElementById('acc-name').value='';document.getElementById('acc-email').value='';document.getElementById('acc-pass').value='';document.getElementById('acc-consent').checked=false;
+  go('intro');
+}
+
+/* AVVIO */
+renderStepper(); go('intro');
+</script>
+</body>
+</html>
