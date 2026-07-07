@@ -32,7 +32,7 @@
   .app{max-width:940px;margin:0 auto;padding:20px 18px 70px}
 
   /* Header + stepper */
-  header.bar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:14px}
+  header.appbar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:14px}
   .logo{display:inline-flex;align-items:center;gap:10px;color:var(--on-shell);text-decoration:none}
   .logo .mark{width:40px;height:40px;border-radius:50%;background:var(--primary);border:3px solid var(--accent);
     display:grid;place-content:center;font-family:var(--display);font-weight:700;color:#fff;font-size:20px}
@@ -243,7 +243,7 @@
   .devnote button{background:none;border:1px dashed rgba(255,255,255,.4);color:var(--on-shell-soft);border-radius:8px;padding:5px 10px;cursor:pointer;font-size:12px}
   /* --- rifiniture UI (fix leggibilità, focus, centratura) --- */
   .app{padding-top:32px}
-  header.bar{justify-content:center;gap:12px}
+  header.appbar{justify-content:center;gap:12px}
   .logo .mark{width:44px;height:44px;font-size:22px}
   .logo b{color:#FFFFFF;font-size:20px;letter-spacing:.3px;text-shadow:0 1px 10px rgba(2,14,33,.7)}
   .logo span{color:var(--on-shell-soft)}
@@ -256,7 +256,7 @@
 <body>
 <a class="skip" href="#main">Salta al contenuto</a>
 <div class="app">
-  <header class="bar">
+  <header class="appbar">
     <a class="logo" href="#" onclick="return false" aria-label="AccessibilityToAll — Compositore Versioni Clienti">
       <span class="mark" aria-hidden="true">A</span>
       <span><b>AccessibilityToAll</b><span>Compositore piattaforma</span></span>
