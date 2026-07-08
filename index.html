@@ -35,8 +35,8 @@
   body{margin:0;font-family:var(--body);color:var(--ink);font-size:16px;line-height:1.55;
     background:radial-gradient(130% 100% at 50% 0%, var(--shell-1) 0%, var(--shell-2) 46%, var(--shell-3) 100%) fixed;
     -webkit-font-smoothing:antialiased;min-height:100vh}
-  .skip{position:absolute;left:-999px;top:0;background:var(--primary);color:#fff;padding:.6rem 1rem;z-index:200;border-radius:0 0 8px 0}
-  .skip:focus{left:0}
+  .skip{position:fixed;left:8px;top:8px;transform:translateY(-160%);background:var(--primary);color:#fff;padding:.6rem 1rem;z-index:200;border-radius:8px;transition:transform .15s}
+  .skip:focus{transform:translateY(0)}
   .app{max-width:940px;margin:0 auto;padding:20px 18px 70px}
 
   /* Header + stepper */
