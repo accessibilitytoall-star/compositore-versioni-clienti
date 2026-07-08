@@ -119,5 +119,18 @@ A(S.confirmedIdeas===1, 'confirmedIdeas incrementa a conferma');
 
 try{ renderReward(); renderLeaderboard(); renderNotifiche(); renderPremiumRow(); A(true);}catch(e){ A(false,'render premium crash: '+e.message); }
 
+/* ===== VISTA TITOLARE: monitoraggio uso, heatmap, questionario, promemoria ===== */
+freshPlans();
+S={screen:'owner',account:{name:'Bea',email:'a@b'},profile:'agenzia',uses:[],trial:7,features:{},theme:{primary:'#0C6CD3',accent:'#EF8216',bg:'#FBF7EF',text:'#211C18',font:'inter'},day:1,usedToday:0,extended:false,active:true,licenze:5,premium:true,interest:{},ideas:[],confirmedIdeas:0,usage:{},quietDay:'Domenica',reminderOn:false,_seeded:false};
+activateGroup('acc'); activateGroup('con'); resolveDeps(); S._mods=activeFnsFlat();
+console.log('--- VISTA TITOLARE: uso, heatmap, questionario, promemoria ---');
+try{ go('owner'); A(true);}catch(e){ A(false,'go(owner) crash: '+e.message); }
+seedUsage(); A(Object.keys(S.usage).length>0, 'seedUsage popola l\'uso delle funzioni');
+var srt=usageSorted(); A(srt.length>0 && srt[0].n>=srt[srt.length-1].n, 'usageSorted ordina dal più al meno usato');
+S.reminderOn=false; toggleReminder(); A(S.reminderOn===true, 'promemoria si attiva (dopo primo download)');
+toggleReminder(); A(S.reminderOn===false, 'promemoria si disattiva');
+S.quietDay='Martedì'; A(S.quietDay==='Martedì', 'giorno più scarico configurabile');
+try{ renderOwner(); renderReminder(); A(true);}catch(e){ A(false,'renderOwner crash: '+e.message); }
+
 console.log('\nRISULTATO: '+pass+' pass / '+fail+' fail');
 process.exit(fail?1:0);

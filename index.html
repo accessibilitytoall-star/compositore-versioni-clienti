@@ -305,6 +305,31 @@
   .leaderboard li.you{border-color:var(--primary);background:#F1F7FE}
   .leaderboard .lname{font-weight:600}
   .leaderboard .lpts{margin-left:auto;font-family:var(--mono);font-size:12px;color:var(--ink-soft)}
+  /* --- Vista Titolare --- */
+  .usechart{display:flex;flex-direction:column;gap:8px;text-align:left}
+  .ubar{display:flex;align-items:center;gap:10px}
+  .ubar .ul{flex:0 0 40%;font-size:13.5px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .ubar .ut{flex:1;height:16px;background:#E7EDF3;border:1px solid var(--line);border-radius:999px;overflow:hidden}
+  .ubar .ut>i{display:block;height:100%;background:linear-gradient(90deg,var(--primary),#3B8BE0)}
+  .ubar .un{flex:0 0 auto;font-family:var(--mono);font-size:12px;color:var(--ink-soft);min-width:28px;text-align:right}
+  .heatmap{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px;text-align:left}
+  .hcell{border-radius:10px;padding:10px 12px;border:1px solid rgba(0,0,0,.06)}
+  .hcell .hn{display:block;font-size:12.5px;font-weight:600;line-height:1.2}
+  .hcell .hv{display:block;font-family:var(--display);font-weight:700;font-size:20px;margin-top:4px}
+  .ownergrid{display:grid;grid-template-columns:1fr;gap:12px;margin:14px 0 0}
+  @media(min-width:620px){.ownergrid{grid-template-columns:1fr 1fr}}
+  .ownercard{border:1.5px solid var(--line);border-radius:12px;padding:14px 16px;background:#fff;text-align:left}
+  .ownercard .obt{font-family:var(--mono);font-size:11px;letter-spacing:.05em;text-transform:uppercase;font-weight:700;color:var(--ink-soft);margin-bottom:8px}
+  .ownercard .orow{padding:5px 0;font-size:14px}
+  .ownercard .orow b{color:var(--primary)}
+  .quest{border:1.5px solid var(--line);border-radius:12px;padding:14px 16px;background:#FBF8F1;text-align:left}
+  .quest .qmeta{font-family:var(--mono);font-size:12px;color:var(--ink-soft);margin-bottom:8px}
+  .quest .qlist{margin:0;padding-left:20px}
+  .quest .qlist li{margin:7px 0;font-size:14.5px}
+  .reminder{border:1.5px solid #F3D9BB;background:#FFF7EF;border-radius:12px;padding:14px 16px;text-align:left}
+  .reminder .remrow{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:6px}
+  .reminder select{border:1.5px solid var(--line);border-radius:9px;padding:9px 11px;font:inherit;font-size:14px;background:#fff}
+  .reminder .btn.ghost{background:#fff}
 </style>
 </head>
 <body>
@@ -693,9 +718,38 @@
       </div>
     </section>
 
+    <!-- 15. VISTA TITOLARE (solo Beatrice) -->
+    <section class="screen" id="sc-owner" aria-labelledby="h-owner">
+      <div class="panel">
+        <p class="eyebrow">Riservato · Vista Titolare</p>
+        <h2 class="sc" id="h-owner" tabindex="-1">Andamento dell'app</h2>
+        <p class="lead">Consultabile solo da te. Ecco come vengono usate le funzioni: le più usate, la mappa di calore e le 3 più e meno usate. Ogni 1° del mese parte il questionario automatico ai clienti.</p>
+
+        <h3>Funzioni più usate</h3>
+        <div class="usechart" id="useChart" role="img" aria-label="Grafico delle funzioni più usate"></div>
+
+        <h3>Mappa di calore</h3>
+        <p class="hint" style="margin-top:-2px">Più scuro = più usata. Il numero d'uso è sempre indicato (non solo il colore).</p>
+        <div class="heatmap" id="heatmap"></div>
+
+        <div class="ownergrid">
+          <div class="ownercard topbox" id="topBox"></div>
+          <div class="ownercard botbox" id="botBox"></div>
+        </div>
+
+        <h3>Questionario mensile automatico</h3>
+        <div class="quest" id="questBox"></div>
+
+        <h3>Promemoria settimanale (solo tuo iPhone)</h3>
+        <div class="reminder" id="reminderBox"></div>
+
+        <div class="actions"><button class="btn ghost" onclick="go('dashboard')">← Torna alla dashboard</button></div>
+      </div>
+    </section>
+
   </main>
 
-  <footer class="foot">AccessibilityToAll SRL · Prototipo accessibile (WCAG) · Compositore Versioni Clienti</footer>
+  <footer class="foot">AccessibilityToAll SRL · Prototipo accessibile (WCAG) · Compositore Versioni Clienti · <a href="#" onclick="go('owner');return false" style="color:#E9D9A6;font-weight:700">🔒 Vista Titolare</a></footer>
 </div>
 
 <!-- POPUP UPGRADE -->
@@ -723,7 +777,8 @@ var S = {
   features:{},          // {fnId:true}
   theme:{primary:'#0C6CD3',accent:'#EF8216',bg:'#FBF7EF',text:'#211C18',font:'inter',fontLabel:'Inter'},
   day:1, usedToday:0, extended:false, active:false,
-  licenze:null, premium:false, interest:{}, ideas:[], confirmedIdeas:0
+  licenze:null, premium:false, interest:{}, ideas:[], confirmedIdeas:0,
+  usage:{}, quietDay:'Domenica', reminderOn:false, _seeded:false
 };
 
 var PLANS = {7:{days:7,cap:50},15:{days:15,cap:25},30:{days:30,cap:12}};
@@ -837,6 +892,7 @@ function go(id){
   if(id==='end') renderEnd();
   if(id==='notifiche') renderNotifiche();
   if(id==='proposte') renderProposte();
+  if(id==='owner') renderOwner();
 }
 function renderStepper(){
   var ol = document.getElementById('stepper');
@@ -1183,6 +1239,7 @@ function useFeature(i){
   var m=(S._mods||[])[i]; if(!m) return;
   if(S.usedToday>=pl.cap){ refreshUseMeter(); flashUse('Tetto di oggi raggiunto ('+pl.cap+' azioni). Torna domani o passa alla versione completa.'); openUpgrade(); return; }
   S.usedToday++;
+  if(!S.usage) S.usage={}; S.usage[m.x]=(S.usage[m.x]||0)+1;
   refreshUseMeter();
   flashUse('Hai usato «'+m.x+'» ✓ — azioni di oggi: '+S.usedToday+'/'+pl.cap+'.');
   spendPulse(i);
@@ -1393,11 +1450,58 @@ function renderLeaderboard(){
 }
 function renderProposte(){ if(!premiumGuard()) return; renderIdeas(); renderReward(); renderLeaderboard(); }
 
+/* ===== VISTA TITOLARE: monitoraggio uso, heatmap, questionario, promemoria ===== */
+function seedUsage(){
+  if(S._seeded) return;
+  var mods=activeFnsFlat();
+  mods.forEach(function(m){ if(S.usage[m.x]==null) S.usage[m.x]=Math.floor(Math.random()*40)+2; });
+  S._seeded=true;
+}
+function usageSorted(){ seedUsage(); return Object.keys(S.usage).map(function(k){return {name:k,n:S.usage[k]};}).sort(function(a,b){return b.n-a.n;}); }
+function renderOwner(){
+  var list=usageSorted();
+  var chart=document.getElementById('useChart');
+  if(!list.length){ chart.innerHTML='<p class="hint">Nessun uso ancora registrato. Usa qualche funzione nella dashboard e torna qui.</p>'; return; }
+  var max=list[0].n||1;
+  chart.innerHTML = list.slice(0,10).map(function(x){
+    var w=Math.round(x.n/max*100);
+    return '<div class="ubar"><span class="ul">'+x.name+'</span><span class="ut"><i style="width:'+w+'%"></i></span><span class="un">'+x.n+'</span></div>';
+  }).join('');
+  chart.setAttribute('aria-label','Funzioni più usate: '+list.slice(0,3).map(function(x){return x.name+' '+x.n+' usi';}).join(', '));
+  document.getElementById('heatmap').innerHTML = list.map(function(x){
+    var t=x.n/max; var bg='rgba(12,108,211,'+(0.12+t*0.78).toFixed(2)+')'; var col=t>0.55?'#fff':'#0C4E8F';
+    return '<div class="hcell" style="background:'+bg+';color:'+col+'"><span class="hn">'+x.name+'</span><span class="hv">'+x.n+'</span></div>';
+  }).join('');
+  var top=list.slice(0,3), bot=list.slice(-3).reverse();
+  document.getElementById('topBox').innerHTML='<div class="obt">🔝 3 più usate</div>'+top.map(function(x,i){return '<div class="orow">'+(i+1)+'. '+x.name+' <b>'+x.n+'</b></div>';}).join('');
+  document.getElementById('botBox').innerHTML='<div class="obt">🔻 3 meno usate</div>'+bot.map(function(x,i){return '<div class="orow">'+(i+1)+'. '+x.name+' <b>'+x.n+'</b></div>';}).join('');
+  document.getElementById('questBox').innerHTML =
+    '<div class="qmeta">Inviato automaticamente il <b>1° di ogni mese</b>, creato con la nostra piattaforma.</div>'+
+    '<ol class="qlist">'+
+    '<li>Cosa ti piace di <b>'+(top[0]?top[0].name:'—')+'</b>, <b>'+(top[1]?top[1].name:'—')+'</b> e <b>'+(top[2]?top[2].name:'—')+'</b> (le 3 più usate)?</li>'+
+    '<li>Quali migliorie faresti a queste 3 funzioni?</li>'+
+    '<li>Cosa non ti piace di <b>'+(bot[0]?bot[0].name:'—')+'</b>, <b>'+(bot[1]?bot[1].name:'—')+'</b> e <b>'+(bot[2]?bot[2].name:'—')+'</b> (le 3 meno usate)?</li>'+
+    '<li>Come le miglioreresti?</li></ol>';
+  renderReminder();
+}
+function renderReminder(){
+  var box=document.getElementById('reminderBox');
+  var days=['Lunedì','Martedì','Mercoledì','Giovedì','Venerdì','Sabato','Domenica'];
+  var opts=days.map(function(d){return '<option value="'+d+'"'+(d===S.quietDay?' selected':'')+'>'+d+'</option>';}).join('');
+  box.innerHTML =
+    '<p style="margin:0 0 8px">Ogni settimana, nel giorno con <b>meno impegni</b>, la tua app <b>suona solo sul tuo iPhone</b> e ti invita a vedere questi grafici. Si attiva <b>solo dopo il primo download gratuito</b>.</p>'+
+    '<div class="remrow"><label for="quietDay">Giorno più scarico</label> <select id="quietDay" onchange="S.quietDay=this.value">'+opts+'</select>'+
+    '<button type="button" class="btn ghost" onclick="toggleReminder()">'+(S.reminderOn?'Disattiva promemoria':'Attiva (simula 1° download)')+'</button></div>'+
+    '<p class="hint" id="remStatus" role="status" style="min-height:18px">'+(S.reminderOn?('✓ Attivo: suona ogni '+S.quietDay+' sul tuo iPhone.'):'Inattivo: si accenderà al primo download gratuito.')+'</p>';
+}
+function toggleReminder(){ S.reminderOn=!S.reminderOn; if(S.reminderOn) announce('Promemoria attivo: suona ogni '+S.quietDay+' sul tuo iPhone.'); renderReminder(); }
+
 function resetAll(){
   S={screen:'intro',account:{name:'',email:''},profile:null,uses:[],trial:null,features:{},
      theme:{primary:'#0C6CD3',accent:'#EF8216',bg:'#FBF7EF',text:'#211C18',font:'inter',fontLabel:'Inter'},
      day:1,usedToday:0,extended:false,active:false,
-     licenze:null,premium:false,interest:{},ideas:[],confirmedIdeas:0};
+     licenze:null,premium:false,interest:{},ideas:[],confirmedIdeas:0,
+     usage:{},quietDay:'Domenica',reminderOn:false,_seeded:false};
   PLANS={7:{days:7,cap:50},15:{days:15,cap:25},30:{days:30,cap:12}};
   IDEAS=IDEAS_SEED.map(function(o){return Object.assign({},o);});
   document.getElementById('acc-name').value='';document.getElementById('acc-email').value='';document.getElementById('acc-pass').value='';document.getElementById('acc-consent').checked=false;
