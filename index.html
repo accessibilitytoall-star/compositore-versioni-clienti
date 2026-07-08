@@ -259,6 +259,52 @@
   #sc-intro .panel{text-align:center}
   #sc-intro .panel .lead{margin-left:auto;margin-right:auto}
   #sc-intro .panel .actions{justify-content:center}
+  /* --- Premium: licenze, notifiche, proposte, idee --- */
+  .licbox{margin:16px auto 0;max-width:440px;text-align:center}
+  .licbox .f{text-align:center}
+  .licbox input[type=number]{width:160px;border:1.5px solid var(--line);border-radius:10px;padding:11px 13px;font-family:inherit;font-size:16px;text-align:center}
+  .licbox .hint,.licbox .err-msg{justify-content:center;text-align:center}
+  .premium-row{display:grid;grid-template-columns:1fr;gap:12px;margin-top:8px;text-align:left}
+  @media(min-width:620px){.premium-row{grid-template-columns:1fr 1fr}}
+  .pcard{position:relative;text-align:left;border:1.5px solid var(--line);border-radius:14px;padding:16px;background:#fff;display:flex;gap:12px;align-items:flex-start;cursor:pointer;font:inherit;width:100%}
+  .pcard:hover{border-color:var(--primary)}
+  .pcard .ic{font-size:26px;line-height:1}
+  .pcard .pt{font-weight:700;font-family:var(--display);font-size:16px}
+  .pcard .pd{font-size:13px;color:var(--ink-soft);margin-top:2px}
+  .pcard.locked{cursor:not-allowed;opacity:.8;background:#F7F3EB}
+  .pcard .lockbadge{position:absolute;top:10px;right:12px;font-family:var(--mono);font-size:10px;letter-spacing:.04em;text-transform:uppercase;font-weight:700;color:var(--warn);background:#FBEFD0;padding:3px 8px;border-radius:999px}
+  .nfeat{border:1.5px solid var(--line);border-radius:14px;padding:14px 16px;margin:0 0 12px;background:#fff;text-align:left}
+  .nfeat .nt{font-weight:700;font-family:var(--display);font-size:16px}
+  .nfeat .nd{font-size:13.5px;color:var(--ink-soft);margin:3px 0 10px}
+  .nfeat .introw{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .nfeat .introw label{font-size:13.5px;font-weight:600}
+  .nfeat .introw input{width:92px;border:1.5px solid var(--line);border-radius:9px;padding:8px 10px;font:inherit;font-size:14px}
+  .nfeat .introw button{border:none;border-radius:9px;padding:9px 14px;font-weight:700;font-size:14px;background:var(--primary);color:#fff;cursor:pointer}
+  .nfeat .done-int{font-family:var(--mono);font-size:12.5px;color:var(--ok);font-weight:700}
+  .nfeat .agg{font-family:var(--mono);font-size:11px;color:var(--ink-soft);margin-top:8px}
+  .idea-list{list-style:none;margin:0 0 10px;padding:0;display:flex;flex-direction:column;gap:10px;text-align:left}
+  .idea-list li{border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;background:#fff}
+  .idea-list .it{font-weight:700;font-family:var(--display);font-size:15px}
+  .idea-list .meta2{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:6px}
+  .badge2{font-family:var(--mono);font-size:10px;letter-spacing:.04em;text-transform:uppercase;font-weight:700;padding:3px 8px;border-radius:999px}
+  .badge2.founder{background:var(--c1-soft);color:#9A3C12}
+  .badge2.status-val{background:#EAF1FB;color:#1E3F73}
+  .badge2.status-conf{background:#E7F4EC;color:#155F38}
+  .badge2.status-dev{background:#FDEBD9;color:#8A4A12}
+  .idea-list .conf{margin-left:auto;font-family:var(--mono);font-size:12px;color:var(--ink-soft)}
+  .idea-list .simbtn{margin-top:8px;font-size:13px;padding:7px 12px;border-radius:9px;border:1px solid var(--line);background:var(--paper);color:var(--primary);cursor:pointer}
+  .idea-list .simbtn:disabled{opacity:.5;cursor:not-allowed}
+  .reward{border:1.5px solid #F3D9BB;background:#FFF7EF;border-radius:14px;padding:14px 16px;margin:0 0 14px;text-align:left}
+  .reward .rp{height:12px;border-radius:999px;background:#EFE1CE;overflow:hidden;margin:8px 0}
+  .reward .rp>i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent),#F7B25A);transition:width .3s}
+  .reward .rt{font-weight:700}
+  .reward .runlocked{color:var(--ok);font-weight:700}
+  .leaderboard{margin:0 0 8px;padding-left:0;list-style:none;counter-reset:lb;text-align:left}
+  .leaderboard li{counter-increment:lb;display:flex;align-items:center;gap:10px;padding:9px 12px;border:1px solid var(--line);border-radius:10px;background:#fff;margin-bottom:6px}
+  .leaderboard li::before{content:counter(lb);font-family:var(--display);font-weight:700;color:var(--primary);width:22px;text-align:center;flex:0 0 auto}
+  .leaderboard li.you{border-color:var(--primary);background:#F1F7FE}
+  .leaderboard .lname{font-weight:600}
+  .leaderboard .lpts{margin-left:auto;font-family:var(--mono);font-size:12px;color:var(--ink-soft)}
 </style>
 </head>
 <body>
@@ -353,6 +399,13 @@
         <p class="lead">Più giorni scegli, meno azioni al giorno hai a disposizione: la prova lunga è pensata per assaggiare con calma, quella corta per spremere tanto in poco tempo. Quando ti avvicini al tetto del giorno ti proponiamo l'upgrade.</p>
         <div class="trials" id="trialCards" role="radiogroup" aria-label="Durata della prova"></div>
         <p class="balance" id="trialBalance" role="status"></p>
+
+        <div class="licbox">
+          <label class="f" for="lic-num">Quante persone useranno lo strumento? <span class="req" aria-hidden="true">*</span></label>
+          <input type="number" id="lic-num" min="1" step="1" inputmode="numeric" aria-required="true" placeholder="es. 5">
+          <p class="hint">Sono le <strong>licenze</strong> = numero di persone che lo useranno, non di dispositivi.</p>
+          <p class="err-msg" id="err-lic" hidden><span aria-hidden="true">⚠</span> Indica quante persone lo useranno (almeno 1).</p>
+        </div>
 
         <div class="actions">
           <button class="btn ghost" onclick="go('profile')">Indietro</button>
@@ -526,6 +579,10 @@
 
         <h3>Le tue funzioni</h3>
         <div class="modgrid" id="dashMods"></div>
+
+        <h3>Area Premium</h3>
+        <p class="hint" id="premiumHint" style="margin-top:-2px"></p>
+        <div class="premium-row" id="premiumRow"></div>
       </div>
     </section>
 
@@ -549,7 +606,8 @@
       <div class="panel" style="text-align:center">
         <div style="font-size:52px" aria-hidden="true">🎉</div>
         <h2 class="sc" id="h-upok" tabindex="-1">Benvenuta nella versione completa!</h2>
-        <p class="lead" style="margin:0 auto 20px">Nessun limite di uso giornaliero. Le tue funzioni, i tuoi dati e il tuo tema restano esattamente come li hai lasciati. Grazie per aver scelto AccessibilityToAll. 🧡</p>
+        <p class="lead" style="margin:0 auto 14px">Nessun limite di uso giornaliero. Le tue funzioni, i tuoi dati e il tuo tema restano esattamente come li hai lasciati. Grazie per aver scelto AccessibilityToAll. 🧡</p>
+        <p class="lead" style="margin:0 auto 20px">Hai anche sbloccato l'<strong>Area Premium</strong>: il <strong>Centro Notifiche</strong> (novità in arrivo + interesse del team) e <strong>Proposte & Idee</strong> (proponi funzioni, diventa fondatore, punta a sconti e JV). La trovi nella dashboard.</p>
         <div class="actions" style="justify-content:center">
           <button class="btn blue" onclick="go('dashboard')">Torna alla dashboard</button>
         </div>
@@ -589,6 +647,52 @@
       </div>
     </section>
 
+    <!-- 13. CENTRO NOTIFICHE (Premium) -->
+    <section class="screen" id="sc-notifiche" aria-labelledby="h-notifiche">
+      <div class="panel">
+        <p class="eyebrow">Premium · Centro Notifiche</p>
+        <h2 class="sc" id="h-notifiche" tabindex="-1">Novità in arrivo</h2>
+        <p class="lead">Ti avvisiamo quando esce una nuova funzione da implementare. Dicci quante persone del tuo team la userebbero: così misuriamo l'interesse e diamo priorità a quelle più richieste.</p>
+        <div id="notifList"></div>
+        <div class="actions"><button class="btn ghost" onclick="go('dashboard')">← Torna alla dashboard</button></div>
+      </div>
+    </section>
+
+    <!-- 14. PROPOSTE & IDEE (Premium) -->
+    <section class="screen" id="sc-proposte" aria-labelledby="h-proposte">
+      <div class="panel">
+        <p class="eyebrow">Premium · Proposte & Idee</p>
+        <h2 class="sc" id="h-proposte" tabindex="-1">Proponi una funzione</h2>
+        <p class="lead">Hai un'idea per una nuova funzione? Raccontacela e allega quello che vuoi — soprattutto <strong>video e screenshot</strong>. Puoi anche fissare una call. Dalle idee confermate dal pubblico nascono le prossime funzioni.</p>
+
+        <label class="f" for="idea-title">Titolo dell'idea <span class="req" aria-hidden="true">*</span></label>
+        <input type="text" id="idea-title" placeholder="Es. Notifiche anche via WhatsApp">
+        <label class="f" for="idea-desc">Descrizione</label>
+        <textarea id="idea-desc" rows="3" style="width:100%;border:1.5px solid var(--line);border-radius:10px;padding:12px 13px;font-family:inherit;font-size:15px"></textarea>
+        <label class="f" for="idea-files">Allega file (video, screenshot, qualsiasi tipo)</label>
+        <input type="file" id="idea-files" multiple accept="video/*,image/*,*/*" onchange="ideaFiles(this)">
+        <p class="hint" id="idea-files-msg"></p>
+        <p class="err-msg" id="err-idea" hidden><span aria-hidden="true">⚠</span> Dai un titolo alla tua idea.</p>
+        <div class="actions">
+          <button class="btn ghost" onclick="bookCall()"><span aria-hidden="true">📅</span> Prenota una call</button>
+          <div class="spacer"></div>
+          <button class="btn primary" onclick="submitIdea()">Invia proposta</button>
+        </div>
+        <p class="hint" id="idea-thanks" role="status" style="color:var(--ok);font-weight:600"></p>
+
+        <h3>Bacheca idee</h3>
+        <p class="lead" style="margin:0 0 12px">Le idee <strong>confermate dal pubblico</strong> diventano funzioni. Chi propone resta il <strong>«fondatore»</strong> di quella funzione (e non vota la propria idea). Chi arriva a <strong>10 idee confermate</strong> ottiene sconti, partnership e diventa <strong>JV partner</strong>.</p>
+        <div class="reward" id="rewardBox"></div>
+        <ul class="idea-list" id="ideaList"></ul>
+
+        <h3>Clienti più attivi</h3>
+        <p class="lead" style="margin:0 0 12px">I clienti più attivi vengono premiati a fine anno.</p>
+        <ol class="leaderboard" id="leaderboard"></ol>
+
+        <div class="actions"><button class="btn ghost" onclick="go('dashboard')">← Torna alla dashboard</button></div>
+      </div>
+    </section>
+
   </main>
 
   <footer class="foot">AccessibilityToAll SRL · Prototipo accessibile (WCAG) · Compositore Versioni Clienti</footer>
@@ -618,7 +722,8 @@ var S = {
   trial:null,           // 7 | 15 | 30
   features:{},          // {fnId:true}
   theme:{primary:'#0C6CD3',accent:'#EF8216',bg:'#FBF7EF',text:'#211C18',font:'inter',fontLabel:'Inter'},
-  day:1, usedToday:0, extended:false, active:false
+  day:1, usedToday:0, extended:false, active:false,
+  licenze:null, premium:false, interest:{}, ideas:[], confirmedIdeas:0
 };
 
 var PLANS = {7:{days:7,cap:50},15:{days:15,cap:25},30:{days:30,cap:12}};
@@ -730,6 +835,8 @@ function go(id){
   if(id==='ready') renderReady();
   if(id==='dashboard') renderDashboard();
   if(id==='end') renderEnd();
+  if(id==='notifiche') renderNotifiche();
+  if(id==='proposte') renderProposte();
 }
 function renderStepper(){
   var ol = document.getElementById('stepper');
@@ -816,12 +923,19 @@ function renderTrials(){
       '<div class="cap"><b>'+p.cap+'</b><br>azioni al giorno</div>'+noext+'</div>';
   }).join('');
   document.getElementById('trialNext').disabled = !S.trial;
+  var ln=document.getElementById('lic-num'); if(ln && S.licenze) ln.value=S.licenze;
   var b=document.getElementById('trialBalance');
   if(S.trial){ var pl=PLANS[S.trial]; b.textContent='Scelta: '+pl.days+' giorni, fino a '+pl.cap+' azioni al giorno ('+(pl.days*pl.cap)+' azioni in totale al massimo).'; }
   else b.textContent='';
 }
 function pickTrial(k){ S.trial=Number(k); renderTrials(); }
-function submitTrial(){ if(!S.trial) return; go('features'); }
+function submitTrial(){
+  if(!S.trial) return;
+  var lic=parseInt(document.getElementById('lic-num').value,10);
+  if(!(lic>=1)){ document.getElementById('err-lic').hidden=false; document.getElementById('lic-num').focus(); return; }
+  S.licenze=lic; document.getElementById('err-lic').hidden=true;
+  go('features');
+}
 
 /* =========================================================
    4. FUNZIONI
@@ -893,6 +1007,7 @@ function renderSummary(){
   html+='<li><span class="k">Account</span><span class="v">'+esc(S.account.name)+' · '+esc(S.account.email)+'</span></li>';
   html+='<li><span class="k">Profilo</span><span class="v">'+(prof?prof.t:'')+'</span></li>';
   html+='<li><span class="k">Prova</span><span class="v">'+pl.days+' giorni · '+pl.cap+' azioni/giorno'+(S.trial===30?' · senza proroga':' · prorogabile')+'</span></li>';
+  html+='<li><span class="k">Licenze</span><span class="v">'+(S.licenze||'—')+' person'+(S.licenze===1?'a':'e')+' (non device)</span></li>';
   html+='<li><span class="k">Gruppi attivi</span><span class="v"><span class="chips">'+grps.map(function(g){return '<span class="chip">'+g.t+' ('+g.n+'/'+g.tot+')</span>';}).join('')+'</span></span></li>';
   html+='<li><span class="k">Funzioni totali</span><span class="v">'+nFns+'</span></li>';
   document.getElementById('sumlist').innerHTML=html;
@@ -1061,6 +1176,7 @@ function renderDashboard(){
   }).join('');
   document.getElementById('lastUsed').textContent='';
   refreshUseMeter();
+  renderPremiumRow();
 }
 function useFeature(i){
   var pl=PLANS[S.trial]||PLANS[7];
@@ -1108,7 +1224,7 @@ function advanceDay(){
 }
 /* Popup upgrade */
 function openUpgrade(){ openOverlay('ov-upgrade'); }
-function confirmUpgrade(){ closeOverlay('ov-upgrade'); go('upok'); S.active=false; updateTrialTag(); }
+function confirmUpgrade(){ closeOverlay('ov-upgrade'); S.premium=true; go('upok'); S.active=false; updateTrialTag(); }
 function openOverlay(id){ var o=document.getElementById(id); o.classList.add('on'); o._returnFocus=document.activeElement; var f=o.querySelector('button'); if(f)f.focus(); document.addEventListener('keydown',escClose); }
 function closeOverlay(id){ var o=document.getElementById(id); o.classList.remove('on'); if(o._returnFocus&&o._returnFocus.focus)o._returnFocus.focus(); document.removeEventListener('keydown',escClose); }
 function escClose(e){ if(e.key==='Escape'){ document.querySelectorAll('.overlay.on').forEach(function(o){o.classList.remove('on');}); } }
@@ -1160,12 +1276,132 @@ function announce(msg){
   if(!liveRegion){ liveRegion=document.createElement('div'); liveRegion.className='sr'; liveRegion.setAttribute('aria-live','polite'); document.body.appendChild(liveRegion); }
   liveRegion.textContent=''; setTimeout(function(){ liveRegion.textContent=msg; }, 60);
 }
+/* ===== PREMIUM: Notifiche, Proposte, Idee ===== */
+var NEW_FEATURES = [
+  {id:'firma', t:'Firma elettronica accessibile', d:'Firma documenti in modo conforme e accessibile.'},
+  {id:'analytics', t:'Analytics del team', d:'Cruscotto con l\'andamento delle attività del team.'},
+  {id:'appmobile', t:'App mobile del cliente', d:'La tua piattaforma anche come app sullo smartphone.'},
+  {id:'crm', t:'Integrazione con il tuo CRM', d:'Collega la piattaforma al CRM che già usi.'},
+  {id:'traduzione', t:'Traduzione automatica accessibile', d:'Contenuti multilingua senza perdere l\'accessibilità.'}
+];
+var IDEAS_SEED = [
+  {id:'i1', title:'Notifiche via WhatsApp', founder:'Studio Rossi', conf:5, status:'conf'},
+  {id:'i2', title:'Report PDF accessibile automatico', founder:'Agenzia Blu', conf:3, status:'val'},
+  {id:'i3', title:'Modalità alto contrasto one-click', founder:'Comune di Prato', conf:8, status:'dev'}
+];
+var IDEAS = IDEAS_SEED.map(function(o){return Object.assign({},o);});
+var LEADER = [ {name:'Studio Rossi', pts:42}, {name:'Agenzia Blu', pts:31}, {name:'Comune di Prato', pts:24} ];
+var CONF_THRESHOLD = 5;   // conferme dal pubblico per «confermata»
+var REWARD_GOAL = 10;     // idee confermate per sconti/partnership/JV
+
+function premiumGuard(){ if(!S.premium){ announce('Funzione Premium: disponibile dopo l\'upgrade.'); go('dashboard'); return false; } return true; }
+
+function renderPremiumRow(){
+  var row=document.getElementById('premiumRow'); var hint=document.getElementById('premiumHint');
+  hint.textContent = S.premium ? 'Sbloccata: hai fatto l\'upgrade.' : 'Si sblocca con l\'upgrade alla versione completa.';
+  var lock = S.premium ? '' : '<span class="lockbadge">🔒 Premium</span>';
+  var cls = S.premium ? '' : ' locked';
+  var onN = S.premium ? "onclick=\"go('notifiche')\"" : 'disabled aria-disabled="true"';
+  var onP = S.premium ? "onclick=\"go('proposte')\"" : 'disabled aria-disabled="true"';
+  row.innerHTML =
+    '<button type="button" class="pcard'+cls+'" '+onN+'>'+lock+'<span class="ic" aria-hidden="true">🔔</span><span><span class="pt">Centro Notifiche</span><span class="pd">Ti avvisiamo quando escono nuove funzioni e misuriamo l\'interesse del tuo team.</span></span></button>'+
+    '<button type="button" class="pcard'+cls+'" '+onP+'>'+lock+'<span class="ic" aria-hidden="true">💡</span><span><span class="pt">Proposte & Idee</span><span class="pd">Proponi funzioni (con video/screenshot), fissa call, diventa fondatore delle tue idee.</span></span></button>';
+}
+
+function renderNotifiche(){
+  if(!premiumGuard()) return;
+  var host=document.getElementById('notifList');
+  host.innerHTML = NEW_FEATURES.map(function(f){
+    var done = S.interest[f.id];
+    var body = (done!=null)
+      ? '<div class="done-int">✓ Interesse segnalato: '+done+' person'+(done===1?'a':'e')+'. Grazie!</div>'
+      : '<div class="introw"><label for="int-'+f.id+'">Quante persone la useranno?</label>'+
+        '<input type="number" id="int-'+f.id+'" min="0" step="1" inputmode="numeric" placeholder="es. '+(S.licenze||3)+'">'+
+        '<button type="button" onclick="signalInterest(\''+f.id+'\')">Segnala interesse</button></div>';
+    return '<div class="nfeat"><div class="nt">'+f.t+'</div><div class="nd">'+f.d+'</div>'+body+'</div>';
+  }).join('');
+  var tot=Object.keys(S.interest).reduce(function(a,k){return a+(S.interest[k]||0);},0);
+  if(tot>0) host.insertAdjacentHTML('beforeend','<p class="agg">Interesse totale raccolto finora: '+tot+' persone su '+Object.keys(S.interest).length+' funzioni.</p>');
+}
+function signalInterest(fid){
+  var el=document.getElementById('int-'+fid); var v=parseInt(el?el.value:'',10); if(isNaN(v)||v<0) v=0;
+  S.interest[fid]=v; announce('Interesse registrato: '+v+' persone.'); renderNotifiche();
+}
+
+function ideaFiles(input){
+  var n=input.files.length; var msg=document.getElementById('idea-files-msg');
+  if(!n){ msg.textContent=''; return; }
+  var names=[].map.call(input.files,function(f){return f.name;}).slice(0,4).join(', ');
+  msg.textContent=n+' file allegat'+(n===1?'o':'i')+': '+names+(n>4?'…':'')+' (video e screenshot benvenuti).';
+}
+function bookCall(){ announce('Richiesta di call inviata.'); document.getElementById('idea-thanks').textContent='📅 Perfetto: ti proponiamo alcuni orari per la call via email.'; }
+function submitIdea(){
+  if(!premiumGuard()) return;
+  var t=(document.getElementById('idea-title').value||'').trim();
+  if(!t){ document.getElementById('err-idea').hidden=false; document.getElementById('idea-title').focus(); return; }
+  document.getElementById('err-idea').hidden=true;
+  var me=(S.account.name||'Tu').split(' ')[0]||'Tu';
+  IDEAS.unshift({id:'u'+Date.now(), title:esc(t), founder:me, conf:0, status:'val', mine:true});
+  document.getElementById('idea-title').value=''; document.getElementById('idea-desc').value='';
+  document.getElementById('idea-files').value=''; document.getElementById('idea-files-msg').textContent='';
+  document.getElementById('idea-thanks').textContent='✓ Proposta inviata! È in bacheca come «in valutazione». Sei tu il fondatore di questa idea.';
+  renderIdeas(); renderReward(); renderLeaderboard();
+}
+function confirmIdea(id){
+  var it=IDEAS.find(function(x){return x.id===id;}); if(!it) return;
+  if(it.mine){ announce('Non puoi confermare la tua idea: sei il fondatore.'); return; }
+  it.conf++; if(it.conf>=CONF_THRESHOLD && it.status==='val') it.status='conf';
+  renderIdeas();
+}
+function simulaConfermaMia(id){
+  var it=IDEAS.find(function(x){return x.id===id;}); if(!it||!it.mine) return;
+  it.conf+=2;
+  if(it.conf>=CONF_THRESHOLD && it.status!=='conf' && it.status!=='dev'){ it.status='conf'; S.confirmedIdeas++; }
+  renderIdeas(); renderReward(); renderLeaderboard();
+}
+function statusLabel(s){ return s==='conf'?'confermata':(s==='dev'?'in sviluppo':'in valutazione'); }
+function statusCls(s){ return s==='conf'?'status-conf':(s==='dev'?'status-dev':'status-val'); }
+function renderIdeas(){
+  var host=document.getElementById('ideaList');
+  host.innerHTML = IDEAS.map(function(it){
+    var btn = it.mine
+      ? '<button type="button" class="simbtn" onclick="simulaConfermaMia(\''+it.id+'\')"'+((it.status==='conf'||it.status==='dev')?' disabled':'')+'>Simula conferme dal pubblico</button>'
+      : '<button type="button" class="simbtn" onclick="confirmIdea(\''+it.id+'\')">Conferma (come pubblico)</button>';
+    return '<li><div class="it">'+it.title+'</div><div class="meta2">'+
+      '<span class="badge2 founder">Fondatore: '+it.founder+(it.mine?' (tu)':'')+'</span>'+
+      '<span class="badge2 '+statusCls(it.status)+'">'+statusLabel(it.status)+'</span>'+
+      '<span class="conf">'+it.conf+' conferme'+(it.mine?' · tu sei escluso dal voto':'')+'</span></div>'+btn+'</li>';
+  }).join('');
+}
+function renderReward(){
+  var box=document.getElementById('rewardBox'); var n=S.confirmedIdeas, goal=REWARD_GOAL;
+  var pct=Math.min(100,Math.round(n/goal*100)); var unlocked=n>=goal;
+  box.innerHTML = '<div class="rt">Le tue idee confermate: '+n+' / '+goal+'</div>'+
+    '<div class="rp"><i style="width:'+pct+'%"></i></div>'+
+    (unlocked
+      ? '<div class="runlocked">🎉 Traguardo raggiunto: sconti, partnership e status JV partner sbloccati!</div>'
+      : '<div class="hint" style="margin:0">A '+goal+' idee confermate dal pubblico: sconti, partnership e diventi JV partner. Ne mancano '+(goal-n)+'.</div>');
+}
+function renderLeaderboard(){
+  var host=document.getElementById('leaderboard');
+  var me=(S.account.name||'Tu').split(' ')[0]||'Tu';
+  var list=LEADER.map(function(o){return Object.assign({},o);});
+  var mineN=IDEAS.filter(function(i){return i.mine;}).length;
+  list.push({name:me+' (tu)', pts:10+mineN*3+S.confirmedIdeas*5, you:true});
+  list.sort(function(a,b){return b.pts-a.pts;});
+  host.innerHTML=list.map(function(x){return '<li class="'+(x.you?'you':'')+'"><span class="lname">'+x.name+'</span><span class="lpts">'+x.pts+' punti</span></li>';}).join('');
+}
+function renderProposte(){ if(!premiumGuard()) return; renderIdeas(); renderReward(); renderLeaderboard(); }
+
 function resetAll(){
   S={screen:'intro',account:{name:'',email:''},profile:null,uses:[],trial:null,features:{},
      theme:{primary:'#0C6CD3',accent:'#EF8216',bg:'#FBF7EF',text:'#211C18',font:'inter',fontLabel:'Inter'},
-     day:1,usedToday:0,extended:false,active:false};
+     day:1,usedToday:0,extended:false,active:false,
+     licenze:null,premium:false,interest:{},ideas:[],confirmedIdeas:0};
   PLANS={7:{days:7,cap:50},15:{days:15,cap:25},30:{days:30,cap:12}};
+  IDEAS=IDEAS_SEED.map(function(o){return Object.assign({},o);});
   document.getElementById('acc-name').value='';document.getElementById('acc-email').value='';document.getElementById('acc-pass').value='';document.getElementById('acc-consent').checked=false;
+  var ln=document.getElementById('lic-num'); if(ln) ln.value='';
   go('intro');
 }
 
