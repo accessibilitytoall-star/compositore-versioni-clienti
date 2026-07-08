@@ -6,7 +6,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Compositore Versioni Clienti — AccessibilityToAll</title>
 <meta name="description" content="Componi da solo la tua piattaforma: scegli funzioni, tema e prova gratuita. Prototipo accessibile di AccessibilityToAll.">
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAyNTYgMjU2Jz48Y2lyY2xlIGN4PScxMjgnIGN5PScxMjgnIHI9JzEyMCcgZmlsbD0nIzBDNkNEMycgc3Ryb2tlPScjRUY4MjE2JyBzdHJva2Utd2lkdGg9JzEwJy8+PHRleHQgeD0nNTAlJyB5PSc1OCUnIGZvbnQtc2l6ZT0nMTQwJyB0ZXh0LWFuY2hvcj0nbWlkZGxlJyBmaWxsPScjZmZmJyBmb250LWZhbWlseT0nQXJpYWwnIGZvbnQtd2VpZ2h0PSdib2xkJz5BPC90ZXh0Pjwvc3ZnPg==">
+<link rel="icon" type="image/png" sizes="48x48" href="favicon-48.png">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#06407E">
+<meta name="apple-mobile-web-app-title" content="AccessibilityToAll">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
@@ -245,9 +252,9 @@
   /* --- rifiniture UI (fix leggibilità, focus, centratura) --- */
   .app{padding-top:32px}
   header.appbar{justify-content:center;gap:12px}
-  .logo .mark{width:44px;height:44px;font-size:22px}
-  .logo b{color:#FFFFFF;font-size:20px;letter-spacing:.3px;text-shadow:0 1px 10px rgba(2,14,33,.7)}
-  .logo span{color:var(--on-shell-soft)}
+  .logo{background:#fff;padding:9px 18px;border-radius:14px;box-shadow:0 10px 26px -14px rgba(0,0,0,.6)}
+  .logo-img{height:40px;width:auto;display:block}
+  @media (max-width:520px){ .logo-img{height:32px} }
   [id^="h-"]:focus,[id^="h-"]:focus-visible{outline:none}
   #sc-intro .panel{text-align:center}
   #sc-intro .panel .lead{margin-left:auto;margin-right:auto}
@@ -258,9 +265,8 @@
 <a class="skip" href="#main">Salta al contenuto</a>
 <div class="app">
   <header class="appbar">
-    <a class="logo" href="#" onclick="return false" aria-label="AccessibilityToAll — Compositore Versioni Clienti">
-      <span class="mark" aria-hidden="true">A</span>
-      <span><b>AccessibilityToAll</b><span>Compositore piattaforma</span></span>
+    <a class="logo" href="#" onclick="return false" aria-label="AccessibilityToAll — Compositore piattaforma">
+      <img class="logo-img" src="logo-a2a.png" alt="AccessibilityToAll">
     </a>
     <span class="trialtag" id="trialtag" hidden></span>
   </header>
